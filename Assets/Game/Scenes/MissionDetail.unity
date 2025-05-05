@@ -439,7 +439,7 @@ GameObject:
   m_Component:
   - component: {fileID: 444188114}
   m_Layer: 5
-  m_Name: Settings
+  m_Name: Missions
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

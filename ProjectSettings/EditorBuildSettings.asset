@@ -16,7 +16,7 @@ EditorBuildSettings:
     guid: 027062cfe6da22848aae5bb6bcc4c8fa
   - enabled: 1
     path: Assets/Game/Scenes/MissionDetail.unity
-    guid: e1442e72afd66b34aa778abff9e70a0a
+    guid: d8e8d394b8c629045aa058f780216692
   - enabled: 1
     path: Assets/Game/Scenes/Nav.unity
     guid: 82f6e3a1660d49644bfb9d25a557f468

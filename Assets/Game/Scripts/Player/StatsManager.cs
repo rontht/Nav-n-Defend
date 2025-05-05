@@ -11,8 +11,8 @@ public class StatsManager : MonoBehaviour
     public int currentHP;
 
     [Header("Combat Stats")]
-    public int damage;
-    public int armor;
+    public int attack;
+    public int defense;
 
 
     private void Awake() {
