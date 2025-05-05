@@ -47,10 +47,10 @@ public class ShopManager : MonoBehaviour
                     StatsManager.Instance.currentHP += item.value;
                     break;
                 case Shop_Item_Data.ItemType.Damage:
-                    StatsManager.Instance.damage += item.value;
+                    StatsManager.Instance.attack += item.value;
                     break;
                 case Shop_Item_Data.ItemType.Armor:
-                    StatsManager.Instance.armor += item.value;
+                    StatsManager.Instance.defense += item.value;
                     break;
             }
             
