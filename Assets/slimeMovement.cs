@@ -8,8 +8,14 @@ using UnityEngine;
 
 public class slimeMovement : MonoBehaviour
 {
+
+    //[SerializeField] private float _moveSpeed = 5f;
+    
     public GameObject Cube;
     public GameObject SlimeMesh;
+    
+    //private Vector2 _velocity;
+    
     public float speed;
     public float totalTime = 4f;
     private float currentTime;
@@ -30,7 +36,10 @@ public class slimeMovement : MonoBehaviour
 
         if (currentTime <= 0)
         {
-           SlimeMesh.transform.position = Vector3.MoveTowards(SlimeMesh.transform.position, Cube.transform.position, speed);
+            float step = speed * Time.deltaTime;
+            SlimeMesh.transform.position = Vector3.MoveTowards(SlimeMesh.transform.position, Cube.transform.position, step);
+            //storedSpeed = speed;
+            //SlimeMesh.transform.position = (Vector3)_velocity * _moveSpeed * Time.deltaTime;
         }
     }
 }
