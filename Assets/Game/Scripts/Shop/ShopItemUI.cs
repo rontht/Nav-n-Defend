@@ -1,61 +1,98 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class ShopItemUI : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("Item Configuration")]
+    public Shop_Item_Data itemData;    [Header("UI Components")]
     public Image iconImage;
-    public TextMeshProUGUI itemNameText;
     public TextMeshProUGUI descriptionText;
     public TextMeshProUGUI costText;
     public Button purchaseButton;
+    public Image itemBackground;
+    public UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable xrInteractable;
     
-    private Shop_Item_Data itemData;
+    [Header("Visual States")]
+    public Color purchasedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+    public Color defaultColor = Color.white;
     
-    public void Initialize(Shop_Item_Data data)
+    
+    private void Awake()
     {
-        itemData = data;
-        
-    
-        if (iconImage != null) iconImage.sprite = data.icon;
-        if (itemNameText != null) itemNameText.text = data.itemName;
-        if (descriptionText != null) descriptionText.text = data.description;
-        if (costText != null) costText.text = $"Cost: {data.cost}";
-        
-      
+        if (xrInteractable != null)
+        {
+            xrInteractable.selectEntered.AddListener(OnXRSelectEntered);
+        }
+
         if (purchaseButton != null)
         {
             purchaseButton.onClick.AddListener(OnPurchaseClicked);
-            UpdateButtonInteractable();
-            ShopManager.Instance.onCurrencyChanged.AddListener(UpdateButtonInteractable);
         }
+    }    private void Start()
+    {
+        if (itemData == null)
+        {
+            Debug.LogError("Shop Item Data not assigned to " + gameObject.name);
+            return;
+        }
+
+        if (iconImage != null) 
+        {
+            iconImage.sprite = itemData.icon;
+            iconImage.color = itemData.isPurchased ? purchasedColor : defaultColor;
+        }
+
+        if (descriptionText != null)
+        {
+            descriptionText.text = $"{itemData.description}\n+{itemData.value} {itemData.type}";
+        }
+        
+        UpdateUI();
+        
+        ShopManager.Instance.onCurrencyChanged.AddListener(UpdateUI);
+        ShopManager.Instance.onItemPurchased.AddListener(UpdateUI);
     }
     
     private void OnPurchaseClicked()
     {
-        if (ShopManager.Instance.TryPurchaseItem(itemData))
+        if (!itemData.isPurchased && ShopManager.Instance.currentCurrency >= itemData.cost)
         {
+            ShopManager.Instance.ShowPurchaseConfirmation(itemData);
+        }
+    }
+
+    private void OnXRSelectEntered(SelectEnterEventArgs args)
+    {
+        OnPurchaseClicked();
+    }
     
-            Debug.Log($"Purchased {itemData.itemName}!");
+    private void UpdateUI()
+    {
+        if (itemData.isPurchased)
+        {
+            if (costText != null) costText.text = "Purchased";
+            if (purchaseButton != null) purchaseButton.interactable = false;
+            if (iconImage != null) iconImage.color = purchasedColor;
+            if (xrInteractable != null) xrInteractable.enabled = false;
         }
         else
         {
-       
-            Debug.Log("Not enough currency!");
+            if (costText != null) costText.text = $"Cost: {itemData.cost}";
+            if (purchaseButton != null) 
+                purchaseButton.interactable = ShopManager.Instance.currentCurrency >= itemData.cost;
+            if (iconImage != null) iconImage.color = defaultColor;
+            if (xrInteractable != null) xrInteractable.enabled = true;
         }
-    }
-    
-    private void UpdateButtonInteractable()
-    {
-        purchaseButton.interactable = ShopManager.Instance.currentCurrency >= itemData.cost;
     }
     
     private void OnDestroy()
     {
         if (ShopManager.Instance != null)
         {
-            ShopManager.Instance.onCurrencyChanged.RemoveListener(UpdateButtonInteractable);
+            ShopManager.Instance.onCurrencyChanged.RemoveListener(UpdateUI);
+            ShopManager.Instance.onItemPurchased.RemoveListener(UpdateUI);
         }
     }
 }

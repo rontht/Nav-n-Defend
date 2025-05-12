@@ -1,35 +1,33 @@
 using UnityEngine;
-using TMPro;
 using UnityEngine.UI;
+using TMPro;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 
 public class ShopUI : MonoBehaviour
-{
+{   
     [Header("UI References")]
     public TextMeshProUGUI currencyText;
-    public Transform shopItemContainer;
-    public GameObject shopItemPrefab;
+    
+    [Header("XR Settings")]
+    public TrackedDeviceGraphicRaycaster xrRaycaster;
     
     private void Start()
     {
         UpdateCurrencyText();
-        PopulateShop();
-        
-     
         ShopManager.Instance.onCurrencyChanged.AddListener(UpdateCurrencyText);
     }
     
     private void UpdateCurrencyText()
     {
-        currencyText.text = $"Currency: {ShopManager.Instance.currentCurrency}";
+        if (currencyText != null)
+            currencyText.text = $"Coins: {ShopManager.Instance.currentCurrency}";
     }
     
-    private void PopulateShop()
+    private void OnDestroy()
     {
-        foreach (Shop_Item_Data item in ShopManager.Instance.availableItems)
+        if (ShopManager.Instance != null)
         {
-            GameObject itemGO = Instantiate(shopItemPrefab, shopItemContainer);
-            ShopItemUI itemUI = itemGO.GetComponent<ShopItemUI>();
-            itemUI.Initialize(item);
+            ShopManager.Instance.onCurrencyChanged.RemoveListener(UpdateCurrencyText);
         }
     }
 }
