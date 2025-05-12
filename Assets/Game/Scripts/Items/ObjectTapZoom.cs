@@ -2,55 +2,63 @@ using UnityEngine;
 
 public class ObjectTapZoom : MonoBehaviour
 {
-    public Camera mainCamera;
-    public Canvas infoCanvas;
-    public Transform zoomTarget;
-    public float zoomSpeed = 5f;
-    public float zoomDistance = 0.5f;
-    private Vector3 originalPosition;
-    private Quaternion originalRotation;
-    private bool isZoomed = false;
+    [Header("UI Elements")]
+    public GameObject unlockPopUp;
+    public GameObject closeButton;
+    public GameObject puzzleBoard;
 
-    void Start()
+    private void Start()
     {
-        originalPosition = mainCamera.transform.position;
-        originalRotation = mainCamera.transform.rotation;
-        infoCanvas.gameObject.SetActive(false);
+        HideUnlockPopUp();
     }
 
     void Update()
     {
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Application.isMobilePlatform)
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.GetTouch(0).position);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
-                Debug.Log("Hit Object: " + hit.transform.name);
-                if (hit.transform == transform)
-                {
-                    if (!isZoomed)
-                        ZoomIn();
-                    else
-                        ZoomOut();
-                }
+                Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+                ObjectOnTap(ray);
+            }
+        }
+        else
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                ObjectOnTap(ray);
             }
         }
     }
 
-    void ZoomIn()
+    void ObjectOnTap(Ray ray)
     {
-        Vector3 direction = (zoomTarget.position - mainCamera.transform.position).normalized;
-        mainCamera.transform.position = zoomTarget.position - direction * zoomDistance;
-        mainCamera.transform.LookAt(zoomTarget);
-        infoCanvas.gameObject.SetActive(true);
-        isZoomed = true;
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.transform == transform)
+            {
+                // Debug.Log($"{gameObject.name} tapped!");
+                ShowUnlockPopUp();
+            }
+        }
     }
 
-    void ZoomOut()
+    void ShowUnlockPopUp()
     {
-        mainCamera.transform.position = originalPosition;
-        mainCamera.transform.rotation = originalRotation;
-        infoCanvas.gameObject.SetActive(false);
-        isZoomed = false;
+        if (unlockPopUp != null && puzzleBoard != null && closeButton != null)
+        {
+            unlockPopUp.SetActive(true);
+            puzzleBoard.SetActive(true);
+        }
+    }
+
+    public void HideUnlockPopUp()
+    {
+        if (unlockPopUp != null && puzzleBoard != null && closeButton != null)
+        {
+            unlockPopUp.SetActive(false);
+            puzzleBoard.SetActive(false);
+        }
     }
 }
