@@ -141,7 +141,7 @@ public class PuzzleManager : MonoBehaviour
         else
         {
             // Second node tapped, check if they match
-            if (AreNodesMatching(selectedNode, tappedNode))
+            if (MatchNodes(selectedNode, tappedNode))
             {
                 Debug.Log("Matched!");
                 selectedNode.SetActive(false);
@@ -152,12 +152,13 @@ public class PuzzleManager : MonoBehaviour
                 Debug.Log("Not a match!");
             }
 
-            selectedNode = null;  // Reset selection
+            selectedNode = null;
         }
     }
 
-    private bool AreNodesMatching(GameObject node1, GameObject node2)
+    private bool MatchNodes(GameObject node1, GameObject node2)
     {
+        // this tries to match 2 nodes and return true or false
         return node1.GetComponent<Renderer>().material.color == node2.GetComponent<Renderer>().material.color;
     }
 }

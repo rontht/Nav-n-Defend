@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6845128669152968965}
   - component: {fileID: 3913285255937723907}
   m_Layer: 0
-  m_Name: SpawnPlane
+  m_Name: ARSpawnPlane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
