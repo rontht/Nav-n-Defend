@@ -5,28 +5,49 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
 
 public class slimeMovement : MonoBehaviour
 {
+    public ARTrackedImageManager trackedImageManager;
+    public GameObject objectToMove;
+    public string targetImageName;
+    public float speed = 1f;
 
-    //[SerializeField] private float _moveSpeed = 5f;
-    
-    public GameObject Cube;
-    public GameObject SlimeMesh;
-    
-    //private Vector2 _velocity;
-    
-    public float speed;
     public float totalTime = 4f;
     private float currentTime;
-   
-    // Start is called before the first frame update
+
+    private Vector3 targetPosition;
+    private bool targetFound = false;
+
+    void OnEnable()
+    {
+        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+    }
+
+    void OnDisable()
+    {
+        trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+    }
+
+    void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
+    {
+        foreach (ARTrackedImage trackedImage in eventArgs.updated)
+        {
+            if (trackedImage.referenceImage.name == targetImageName)
+            {
+                targetPosition = trackedImage.transform.position;
+                targetFound = trackedImage.trackingState == TrackingState.Tracking;
+            }
+        }
+    }
+    
     void Start()
     {
         currentTime = totalTime;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (currentTime > 0)
@@ -34,12 +55,15 @@ public class slimeMovement : MonoBehaviour
             currentTime -= Time.deltaTime;
         }
 
-        if (currentTime <= 0)
+        if (targetFound && currentTime <= 0)
         {
             float step = speed * Time.deltaTime;
-            SlimeMesh.transform.position = Vector3.MoveTowards(SlimeMesh.transform.position, Cube.transform.position, step);
-            //storedSpeed = speed;
-            //SlimeMesh.transform.position = (Vector3)_velocity * _moveSpeed * Time.deltaTime;
+            objectToMove.transform.position = Vector3.MoveTowards(
+                objectToMove.transform.position,
+                targetPosition,
+                step
+            );
         }
     }
+
 }

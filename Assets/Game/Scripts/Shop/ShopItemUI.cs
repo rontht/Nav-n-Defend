@@ -1,61 +1,154 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Controls the UI for individual shop items:
+/// - Displays item info (name, cost, description)
+/// - Handles purchase button interactions
+/// - Updates visual state (purchased/available)
+/// - Supports both regular and XR interaction
+/// - Responds to player currency changes
+/// 
+/// Attach this component to each shop item card/button in the shop UI.
+/// </summary>
 public class ShopItemUI : MonoBehaviour
 {
-    [Header("UI Components")]
+    [Header("Item Configuration")]
+    public Shop_Item_Data itemData;    [Header("UI Components")]
     public Image iconImage;
-    public TextMeshProUGUI itemNameText;
     public TextMeshProUGUI descriptionText;
     public TextMeshProUGUI costText;
     public Button purchaseButton;
+    public Image itemBackground;
+    public UnityEngine.XR.Interaction.Toolkit.Interactables.XRSimpleInteractable xrInteractable;
     
-    private Shop_Item_Data itemData;
+    [Header("Visual States")]
+    public Color purchasedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+    public Color defaultColor = Color.white;
     
-    public void Initialize(Shop_Item_Data data)
+      private void Awake()
     {
-        itemData = data;
-        
-    
-        if (iconImage != null) iconImage.sprite = data.icon;
-        if (itemNameText != null) itemNameText.text = data.itemName;
-        if (descriptionText != null) descriptionText.text = data.description;
-        if (costText != null) costText.text = $"Cost: {data.cost}";
-        
-      
-        if (purchaseButton != null)
+        if (xrInteractable != null)
         {
-            purchaseButton.onClick.AddListener(OnPurchaseClicked);
-            UpdateButtonInteractable();
-            ShopManager.Instance.onCurrencyChanged.AddListener(UpdateButtonInteractable);
+            xrInteractable.selectEntered.AddListener(OnXRSelectEntered);
         }
-    }
-    
-    private void OnPurchaseClicked()
+    }    private void Start()
     {
-        if (ShopManager.Instance.TryPurchaseItem(itemData))
+        if (itemData == null)
         {
-    
-            Debug.Log($"Purchased {itemData.itemName}!");
+            Debug.LogError("Shop Item Data not assigned to " + gameObject.name);
+            return;
+        }
+
+        InitializeUI();
+        UpdateUI();
+        
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.onCoinsChanged += UpdateUI;
+            PlayerStats.Instance.onStatsChanged += UpdateUI;
         }
         else
         {
-       
-            Debug.Log("Not enough currency!");
+            Debug.LogWarning("PlayerStats.Instance is null, cannot add listeners");
+        }
+    }    /// <summary>
+    /// Sets up the initial UI state for the shop item:
+    /// - Sets the item icon and color
+    /// - Configures the description text with item details
+    /// Called once during Start
+    /// </summary>
+    private void InitializeUI()
+    {
+        if (iconImage != null) 
+        {
+            iconImage.sprite = itemData.icon;
+            iconImage.color = itemData.isPurchased ? purchasedColor : defaultColor;
+        }
+
+        if (descriptionText != null)
+        {
+            descriptionText.text = $"{itemData.description}\n+{itemData.value} {itemData.type}";
+        }
+    }    
+    /// <summary>
+    /// Handles the purchase button click or XR selection:
+    /// - Validates item data and manager references
+    /// - Checks if item can be purchased
+    /// - Shows purchase confirmation dialog
+    /// Called by button click or XR interaction
+    /// </summary>
+    public void OnPurchaseClicked()
+    {
+        Debug.Log($"OnPurchaseClicked for item: {itemData?.itemName ?? "NULL ITEM"}");
+
+        if (itemData == null)
+        {
+            Debug.LogError("ItemData is null!");
+            return;
+        }
+        if (ShopManager.Instance == null)
+        {
+            Debug.LogError("ShopManager.Instance is null!");
+            return;
+        }
+
+        if (!itemData.isPurchased && PlayerStats.Instance.CanAfford(itemData.cost))
+        {
+            ShopManager.Instance.ShowPurchaseConfirmation(itemData);
+        }
+        else
+        {
+            Debug.LogWarning($"Conditions NOT MET for purchase. isPurchased={itemData.isPurchased}, currentCoins={PlayerStats.Instance.coins}, cost={itemData.cost}");
         }
     }
-    
-    private void UpdateButtonInteractable()
+
+    private void OnXRSelectEntered(SelectEnterEventArgs args)
     {
-        purchaseButton.interactable = ShopManager.Instance.currentCurrency >= itemData.cost;
-    }
-    
-    private void OnDestroy()
+        OnPurchaseClicked();
+    }    
+    /// <summary>
+    /// Updates the item's UI state based on:
+    /// - Purchase status (changes color and button state if purchased)
+    /// - Affordability (disables button if player can't afford)
+    /// - XR interaction state
+    /// Called automatically when player stats or currency changes
+    /// </summary>
+    private void UpdateUI()
     {
-        if (ShopManager.Instance != null)
+        if (itemData == null) return;
+
+        if (itemData.isPurchased)
         {
-            ShopManager.Instance.onCurrencyChanged.RemoveListener(UpdateButtonInteractable);
+            if (costText != null) costText.text = "Purchased";
+            if (purchaseButton != null) purchaseButton.interactable = false;
+            if (iconImage != null) iconImage.color = purchasedColor;
+            if (xrInteractable != null) xrInteractable.enabled = false;
+        }
+        else
+        {
+            if (costText != null) costText.text = $"Cost: {itemData.cost}";
+            if (purchaseButton != null && PlayerStats.Instance != null)
+                purchaseButton.interactable = PlayerStats.Instance.CanAfford(itemData.cost);
+            else if (purchaseButton != null)
+                purchaseButton.interactable = false;
+
+            if (iconImage != null) iconImage.color = defaultColor;
+            if (xrInteractable != null) xrInteractable.enabled = true;
+        }
+    }
+      private void OnDestroy()
+    {
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.onCoinsChanged -= UpdateUI;
+            PlayerStats.Instance.onStatsChanged -= UpdateUI;
+        }
+        if (xrInteractable != null)
+        {
+            xrInteractable.selectEntered.RemoveListener(OnXRSelectEntered);
         }
     }
 }
