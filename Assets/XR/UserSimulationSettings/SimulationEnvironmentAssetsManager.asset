@@ -15,6 +15,7 @@ MonoBehaviour:
   m_EnvironmentPrefabPaths:
   - Assets/ARTestSimulation.prefab
   - Assets/RonsEnvironment.prefab
+  - Assets/testAR01 1.prefab
   - Assets/testAR01.prefab
   - Packages/com.unity.xr.arfoundation/Assets/Prefabs/DefaultSimulationEnvironment.prefab
   m_FallbackAtEndOfList: 1
