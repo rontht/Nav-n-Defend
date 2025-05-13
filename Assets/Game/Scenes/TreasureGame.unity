@@ -544,7 +544,7 @@ MonoBehaviour:
   gridPrefab: {fileID: 8525509776621616652, guid: fb6fd76577cd9854ab752ebafca88b1c,
     type: 3}
   gridSize: 5
-  tileSize: 0.3
+  tileSize: 0.1
   nodeColors:
   - {r: 0.10323961, g: 0.45403522, b: 0.754717, a: 0}
   - {r: 0.7924528, g: 0.08597367, b: 0.08597367, a: 0}
