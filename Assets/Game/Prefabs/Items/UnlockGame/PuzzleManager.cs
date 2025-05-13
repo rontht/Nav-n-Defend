@@ -5,47 +5,42 @@ public class PuzzleManager : MonoBehaviour
 {
     public static PuzzleManager Instance { get; private set; }
 
-    public GameObject nodePrefab;         // Capsule node prefab
-    public GameObject gridPrefab;         // Single grid piece prefab (like a chessboard tile)
-    public int gridSize = 5;              // Grid size (5x5)
-    public float tileSize = 1.0f;         // Size of each grid tile
-    public Color[] nodeColors;            // Colors for the node pairs (at least 3 colors)
+    [Header("Prefabs")]
+    public GameObject nodePrefab;
+    public GameObject gridPrefab;
 
-    private GameObject[,] gridPieces;     // Store grid pieces for layout
-    private List<GameObject> nodes;       // Store spawned nodes
-    private GameObject selectedNode;      // Currently selected node
+    [Header("Game Configs")]
+    public int tileCount = 5;
+    public float tileSize = 1.0f;
+    public int nodeCount = 3;
+    public Color[] nodeColors;
+
+    private GameObject[,] gridPieces;
+    private List<GameObject> nodes;
+    private GameObject selectedNode;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
-        {
             Destroy(gameObject);
-        }
         else
-        {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-        }
     }
 
     private void Start()
     {
+        // set up game objects
         nodes = new List<GameObject>();
-        gridPieces = new GameObject[gridSize, gridSize];
+        gridPieces = new GameObject[tileCount, tileCount];
     }
 
-    public void StartPuzzle()
+    public void StartPuzzle(Vector3 origin)
     {
-        Debug.Log("Puzzle Started!");
-
-        // Clear any existing grid and nodes
+        // cleanup the board and start spawning game objects
         ClearExistingGridAndNodes();
-
-        // Spawn the grid
-        SpawnGrid();
-
-        // Spawn 3 pairs of nodes
-        SpawnNodePairs(3);
+        SpawnGrid(origin);
+        SpawnNodePairs(nodeCount, origin);
     }
 
     private void ClearExistingGridAndNodes()
@@ -54,29 +49,28 @@ public class PuzzleManager : MonoBehaviour
         {
             Destroy(node);
         }
+
         nodes.Clear();
 
-        for (int i = 0; i < gridSize; i++)
+        for (int i = 0; i < tileCount; i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < tileCount; j++)
             {
                 if (gridPieces[i, j] != null)
-                {
                     Destroy(gridPieces[i, j]);
-                }
             }
         }
     }
 
-    private void SpawnGrid()
+    private void SpawnGrid(Vector3 origin)
     {
-        float halfGrid = (gridSize - 1) * tileSize / 2;
+        float halfGrid = (tileCount - 1) * tileSize / 2;
 
-        for (int i = 0; i < gridSize; i++)
+        for (int i = 0; i < tileCount; i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < tileCount; j++)
             {
-                Vector3 position = new Vector3(i * tileSize - halfGrid, 0, j * tileSize - halfGrid);
+                Vector3 position = origin + new Vector3(i * tileSize - halfGrid, 0, j * tileSize - halfGrid);
                 GameObject gridPiece = Instantiate(gridPrefab, position, Quaternion.identity);
                 gridPiece.name = $"Grid_{i}_{j}";
                 gridPiece.transform.localScale = new Vector3(tileSize, 0.1f, tileSize);
@@ -85,14 +79,14 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
-    private void SpawnNodePairs(int pairCount)
+    private void SpawnNodePairs(int pairCount, Vector3 origin)
     {
         List<Vector2Int> availablePositions = new List<Vector2Int>();
 
         // Populate all possible grid positions
-        for (int i = 0; i < gridSize; i++)
+        for (int i = 0; i < tileCount; i++)
         {
-            for (int j = 0; j < gridSize; j++)
+            for (int j = 0; j < tileCount; j++)
             {
                 availablePositions.Add(new Vector2Int(i, j));
             }
@@ -111,9 +105,9 @@ public class PuzzleManager : MonoBehaviour
                 availablePositions.RemoveAt(randomIndex);
 
                 // Calculate the node position (centered within the tile)
-                Vector3 nodePosition = new Vector3(gridPos.x * tileSize - (gridSize - 1) * tileSize / 2,
+                Vector3 nodePosition = origin + new Vector3(gridPos.x * tileSize - (tileCount - 1) * tileSize / 2,
                                                    tileSize / 2,
-                                                   gridPos.y * tileSize - (gridSize - 1) * tileSize / 2);
+                                                   gridPos.y * tileSize - (tileCount - 1) * tileSize / 2);
                 
                 GameObject node = Instantiate(nodePrefab, nodePosition, Quaternion.identity);
                 node.name = $"Node_{pair}_{n}";
@@ -134,7 +128,7 @@ public class PuzzleManager : MonoBehaviour
         {
             HandleTouch(Input.GetTouch(0).position);
         }
-        else if (Input.GetMouseButtonDown(0)) // For editor testing
+        else if (Input.GetMouseButtonDown(0))
         {
             HandleTouch(Input.mousePosition);
         }

@@ -19,7 +19,7 @@ public class TreasureBoxDetection : MonoBehaviour
                     if (hit.transform == transform)
                     {
                         Debug.Log($"{gameObject.name} tapped! Tap Version");
-                        PuzzleManager.Instance.StartPuzzle();
+                        PuzzleManager.Instance.StartPuzzle(transform.position);
                         gameObject.SetActive(false);
                     }
                 }
@@ -32,7 +32,7 @@ public class TreasureBoxDetection : MonoBehaviour
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 Debug.Log($"{gameObject.name} tapped! Mouse Version");
-                PuzzleManager.Instance.StartPuzzle();
+                PuzzleManager.Instance.StartPuzzle(transform.position);
                 gameObject.SetActive(false);
             }
         }
