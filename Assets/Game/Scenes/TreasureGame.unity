@@ -543,8 +543,9 @@ MonoBehaviour:
     type: 3}
   gridPrefab: {fileID: 8525509776621616652, guid: fb6fd76577cd9854ab752ebafca88b1c,
     type: 3}
-  gridSize: 5
+  tileCount: 5
   tileSize: 0.1
+  nodeCount: 3
   nodeColors:
   - {r: 0.10323961, g: 0.45403522, b: 0.754717, a: 0}
   - {r: 0.7924528, g: 0.08597367, b: 0.08597367, a: 0}
@@ -1002,6 +1003,7 @@ GameObject:
   - component: {fileID: 2512387470422636641}
   - component: {fileID: 2512387470422636642}
   - component: {fileID: 2512387470422636670}
+  - component: {fileID: 2512387470422636671}
   m_Layer: 0
   m_Name: XR Origin (AR Rig)
   m_TagString: Untagged
@@ -1026,6 +1028,21 @@ MonoBehaviour:
   m_MaxNumberOfMovingImages: 0
   m_TrackedImagePrefab: {fileID: 2311161942338346594, guid: a07144645e548af4994947bff9acb681,
     type: 3}
+--- !u!114 &2512387470422636671
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2512387470422636669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1760703bbd54c04488a8d10600262ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PlanePrefab: {fileID: 2392333725108815975, guid: eb20343d8666df643acf7c5963b75169,
+    type: 3}
+  m_DetectionMode: -1
 --- !u!4 &2512387470860572925
 Transform:
   m_ObjectHideFlags: 0
