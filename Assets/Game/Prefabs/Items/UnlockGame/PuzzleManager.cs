@@ -25,7 +25,7 @@ public class PuzzleManager : MonoBehaviour
             Destroy(gameObject);
         else
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -38,84 +38,67 @@ public class PuzzleManager : MonoBehaviour
     public void StartPuzzle(Vector3 origin)
     {
         // cleanup the board and start spawning game objects
-        ClearExistingGridAndNodes();
-        SpawnGrid(origin);
-        SpawnNodePairs(nodeCount, origin);
+        CleanUpBoard();
+        SpawnTiles(origin);
+        SpawnNodes(nodeCount, origin);
     }
 
-    private void ClearExistingGridAndNodes()
+    private void CleanUpBoard()
     {
+        // wipe everything clean
         foreach (var node in nodes)
-        {
             Destroy(node);
-        }
 
         nodes.Clear();
 
         for (int i = 0; i < tileCount; i++)
-        {
             for (int j = 0; j < tileCount; j++)
-            {
                 if (gridPieces[i, j] != null)
                     Destroy(gridPieces[i, j]);
-            }
-        }
     }
 
-    private void SpawnGrid(Vector3 origin)
+    private void SpawnTiles(Vector3 origin)
     {
-        float halfGrid = (tileCount - 1) * tileSize / 2;
-
+        // spawn a grid of tiles based on tileCount
         for (int i = 0; i < tileCount; i++)
-        {
             for (int j = 0; j < tileCount; j++)
             {
-                Vector3 position = origin + new Vector3(i * tileSize - halfGrid, 0, j * tileSize - halfGrid);
+                Vector3 position = origin + new Vector3(i * tileSize - (tileCount - 1) * tileSize / 2, 0, j * tileSize - (tileCount - 1) * tileSize / 2);
                 GameObject gridPiece = Instantiate(gridPrefab, position, Quaternion.identity);
                 gridPiece.name = $"Grid_{i}_{j}";
                 gridPiece.transform.localScale = new Vector3(tileSize, 0.1f, tileSize);
                 gridPieces[i, j] = gridPiece;
             }
-        }
     }
 
-    private void SpawnNodePairs(int pairCount, Vector3 origin)
+    private void SpawnNodes(int pairCount, Vector3 origin)
     {
+        // count available positions on the puzzle board
         List<Vector2Int> availablePositions = new List<Vector2Int>();
-
-        // Populate all possible grid positions
         for (int i = 0; i < tileCount; i++)
-        {
             for (int j = 0; j < tileCount; j++)
-            {
                 availablePositions.Add(new Vector2Int(i, j));
-            }
-        }
 
-        // Spawn each pair
+        // randomly spawn each node pairs
         for (int pair = 0; pair < pairCount; pair++)
         {
             Color pairColor = nodeColors[pair % nodeColors.Length];
-
             for (int n = 0; n < 2; n++)
             {
-                // Pick a random available position
+                // pick a random available position
                 int randomIndex = Random.Range(0, availablePositions.Count);
                 Vector2Int gridPos = availablePositions[randomIndex];
                 availablePositions.RemoveAt(randomIndex);
 
-                // Calculate the node position (centered within the tile)
-                Vector3 nodePosition = origin + new Vector3(gridPos.x * tileSize - (tileCount - 1) * tileSize / 2,
-                                                   tileSize / 2,
-                                                   gridPos.y * tileSize - (tileCount - 1) * tileSize / 2);
-                
+                // calculate the node position (centered within the tile)
+                Vector3 nodePosition = origin + new Vector3(gridPos.x * tileSize - (tileCount - 1) * tileSize / 2, tileSize / 2, gridPos.y * tileSize - (tileCount - 1) * tileSize / 2);
                 GameObject node = Instantiate(nodePrefab, nodePosition, Quaternion.identity);
                 node.name = $"Node_{pair}_{n}";
-                
-                // Scale node to fit within the tile
+
+                // scale node to fit within the tile
                 node.transform.localScale = Vector3.one * (tileSize * 0.6f);
 
-                // Set the node color
+                // set the node color
                 node.GetComponent<Renderer>().material.color = pairColor;
                 nodes.Add(node);
             }
