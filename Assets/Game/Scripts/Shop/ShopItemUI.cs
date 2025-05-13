@@ -3,6 +3,16 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Controls the UI for individual shop items:
+/// - Displays item info (name, cost, description)
+/// - Handles purchase button interactions
+/// - Updates visual state (purchased/available)
+/// - Supports both regular and XR interaction
+/// - Responds to player currency changes
+/// 
+/// Attach this component to each shop item card/button in the shop UI.
+/// </summary>
 public class ShopItemUI : MonoBehaviour
 {
     [Header("Item Configuration")]
@@ -18,17 +28,11 @@ public class ShopItemUI : MonoBehaviour
     public Color purchasedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
     public Color defaultColor = Color.white;
     
-    
-    private void Awake()
+      private void Awake()
     {
         if (xrInteractable != null)
         {
             xrInteractable.selectEntered.AddListener(OnXRSelectEntered);
-        }
-
-        if (purchaseButton != null)
-        {
-            purchaseButton.onClick.AddListener(OnPurchaseClicked);
         }
     }    private void Start()
     {
@@ -38,6 +42,26 @@ public class ShopItemUI : MonoBehaviour
             return;
         }
 
+        InitializeUI();
+        UpdateUI();
+        
+        if (PlayerStats.Instance != null)
+        {
+            PlayerStats.Instance.onCoinsChanged += UpdateUI;
+            PlayerStats.Instance.onStatsChanged += UpdateUI;
+        }
+        else
+        {
+            Debug.LogWarning("PlayerStats.Instance is null, cannot add listeners");
+        }
+    }    /// <summary>
+    /// Sets up the initial UI state for the shop item:
+    /// - Sets the item icon and color
+    /// - Configures the description text with item details
+    /// Called once during Start
+    /// </summary>
+    private void InitializeUI()
+    {
         if (iconImage != null) 
         {
             iconImage.sprite = itemData.icon;
@@ -48,28 +72,54 @@ public class ShopItemUI : MonoBehaviour
         {
             descriptionText.text = $"{itemData.description}\n+{itemData.value} {itemData.type}";
         }
-        
-        UpdateUI();
-        
-        ShopManager.Instance.onCurrencyChanged.AddListener(UpdateUI);
-        ShopManager.Instance.onItemPurchased.AddListener(UpdateUI);
-    }
-    
-    private void OnPurchaseClicked()
+    }    
+    /// <summary>
+    /// Handles the purchase button click or XR selection:
+    /// - Validates item data and manager references
+    /// - Checks if item can be purchased
+    /// - Shows purchase confirmation dialog
+    /// Called by button click or XR interaction
+    /// </summary>
+    public void OnPurchaseClicked()
     {
-        if (!itemData.isPurchased && ShopManager.Instance.currentCurrency >= itemData.cost)
+        Debug.Log($"OnPurchaseClicked for item: {itemData?.itemName ?? "NULL ITEM"}");
+
+        if (itemData == null)
+        {
+            Debug.LogError("ItemData is null!");
+            return;
+        }
+        if (ShopManager.Instance == null)
+        {
+            Debug.LogError("ShopManager.Instance is null!");
+            return;
+        }
+
+        if (!itemData.isPurchased && PlayerStats.Instance.CanAfford(itemData.cost))
         {
             ShopManager.Instance.ShowPurchaseConfirmation(itemData);
+        }
+        else
+        {
+            Debug.LogWarning($"Conditions NOT MET for purchase. isPurchased={itemData.isPurchased}, currentCoins={PlayerStats.Instance.coins}, cost={itemData.cost}");
         }
     }
 
     private void OnXRSelectEntered(SelectEnterEventArgs args)
     {
         OnPurchaseClicked();
-    }
-    
+    }    
+    /// <summary>
+    /// Updates the item's UI state based on:
+    /// - Purchase status (changes color and button state if purchased)
+    /// - Affordability (disables button if player can't afford)
+    /// - XR interaction state
+    /// Called automatically when player stats or currency changes
+    /// </summary>
     private void UpdateUI()
     {
+        if (itemData == null) return;
+
         if (itemData.isPurchased)
         {
             if (costText != null) costText.text = "Purchased";
@@ -80,19 +130,25 @@ public class ShopItemUI : MonoBehaviour
         else
         {
             if (costText != null) costText.text = $"Cost: {itemData.cost}";
-            if (purchaseButton != null) 
-                purchaseButton.interactable = ShopManager.Instance.currentCurrency >= itemData.cost;
+            if (purchaseButton != null && PlayerStats.Instance != null)
+                purchaseButton.interactable = PlayerStats.Instance.CanAfford(itemData.cost);
+            else if (purchaseButton != null)
+                purchaseButton.interactable = false;
+
             if (iconImage != null) iconImage.color = defaultColor;
             if (xrInteractable != null) xrInteractable.enabled = true;
         }
     }
-    
-    private void OnDestroy()
+      private void OnDestroy()
     {
-        if (ShopManager.Instance != null)
+        if (PlayerStats.Instance != null)
         {
-            ShopManager.Instance.onCurrencyChanged.RemoveListener(UpdateUI);
-            ShopManager.Instance.onItemPurchased.RemoveListener(UpdateUI);
+            PlayerStats.Instance.onCoinsChanged -= UpdateUI;
+            PlayerStats.Instance.onStatsChanged -= UpdateUI;
+        }
+        if (xrInteractable != null)
+        {
+            xrInteractable.selectEntered.RemoveListener(OnXRSelectEntered);
         }
     }
 }

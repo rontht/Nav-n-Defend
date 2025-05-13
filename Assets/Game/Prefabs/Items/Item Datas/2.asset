@@ -15,8 +15,8 @@ MonoBehaviour:
   id: e666d986-ea23-4a57-bfb3-46bac030d2e8
   itemName: 
   description: 
-  cost: 0
-  icon: {fileID: 0}
-  type: 0
-  value: 0
+  cost: 50
+  icon: {fileID: 21300000, guid: a4a86ca2eb8ecc944a85f9fa140bb903, type: 3}
+  type: 1
+  value: 10
   isPurchased: 0

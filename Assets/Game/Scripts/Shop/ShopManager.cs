@@ -4,46 +4,44 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 
+/// <summary>
+/// Manages the in-game shop system, handling:
+/// - Purchase confirmation flow
+/// - Available items list
+/// - Integration with PlayerStats for purchases
+/// 
+/// This manager coordinates between ShopItemUI components and the PlayerStats
+/// system to process purchases and update the game state.
+/// </summary>
 public class ShopManager : MonoBehaviour
 {
+    /// <summary>
+    /// Singleton instance of the shop manager
+    /// </summary>
     public static ShopManager Instance;
-    
-    [Header("Currency")]
-    public int currentCurrency = 0;
     
     [Header("Shop Items")]
     public List<Shop_Item_Data> availableItems = new List<Shop_Item_Data>();
     
     [Header("UI References")]
-    public TextMeshProUGUI currencyText;
     public GameObject purchaseConfirmationDialog;
     public TextMeshProUGUI confirmationText;
     
-    public UnityEvent onCurrencyChanged;
     public UnityEvent onItemPurchased;
 
     private Shop_Item_Data pendingPurchaseItem;
-    private const string CURRENCY_PREFS_KEY = "Currency";
-    private const string PURCHASED_ITEMS_PREFS_KEY = "PurchasedItems";
-    
-    private void Awake()
+      private void Awake()
     {
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
-            
-        LoadData();
-    }
-
-    public void AddCurrency(int amount)
-    {
-        currentCurrency += amount;
-        SaveCurrency();
-        onCurrencyChanged?.Invoke();
-        UpdateCurrencyText();
-    }
-
+    }    
+    /// <summary>
+    /// Displays the purchase confirmation dialog for an item.
+    /// Shows the item name and cost, and stores the item for the confirmation callback.
+    /// </summary>
+    /// <param name="item">The shop item the player wants to purchase</param>
     public void ShowPurchaseConfirmation(Shop_Item_Data item)
     {
         pendingPurchaseItem = item;
@@ -55,8 +53,6 @@ public class ShopManager : MonoBehaviour
     {
         if (pendingPurchaseItem != null && TryPurchaseItem(pendingPurchaseItem))
         {
-            pendingPurchaseItem.isPurchased = true;
-            SavePurchasedItems();
             onItemPurchased?.Invoke();
         }
         ClosePurchaseConfirmation();
@@ -66,90 +62,25 @@ public class ShopManager : MonoBehaviour
     {
         purchaseConfirmationDialog.SetActive(false);
         pendingPurchaseItem = null;
-    }
-    
+    }    
+    /// <summary>
+    /// Attempts to purchase an item by:
+    /// 1. Checking if player can afford it
+    /// 2. Spending the coins
+    /// 3. Applying the item's stat boost
+    /// 4. Marking the item as purchased
+    /// </summary>
+    /// <param name="item">The item to purchase</param>
+    /// <returns>True if purchase was successful, false otherwise</returns>
     private bool TryPurchaseItem(Shop_Item_Data item)
     {
-        if (currentCurrency >= item.cost)
+        if (PlayerStats.Instance.CanAfford(item.cost))
         {
-            currentCurrency -= item.cost;
-            SaveCurrency();
-            onCurrencyChanged?.Invoke();
-            
-            switch (item.type)
-            {
-                case Shop_Item_Data.ItemType.maxHP:
-                    StatsManager.Instance.maxHP += item.value;
-                    StatsManager.Instance.currentHP += item.value;
-                    break;
-                case Shop_Item_Data.ItemType.attack:
-                    StatsManager.Instance.attack += item.value;
-                    break;
-                case Shop_Item_Data.ItemType.defense:
-                    StatsManager.Instance.defense += item.value;
-                    break;
-            }
-
-            SaveStats();
+            PlayerStats.Instance.SpendCoins(item.cost);
+            PlayerStats.Instance.IncreaseStat(item.type, item.value);
+            PlayerStats.Instance.MarkItemAsPurchased(item.id);
             return true;
         }
         return false;
-    }
-    
-    private void UpdateCurrencyText()
-    {
-        if (currencyText != null)
-            currencyText.text = $"Coins: {currentCurrency}";
-    }
-    
-    private void SaveCurrency()
-    {
-        PlayerPrefs.SetInt(CURRENCY_PREFS_KEY, currentCurrency);
-        PlayerPrefs.Save();
-    }
-    
-    private void LoadData()
-    {
-        // Load currency (Default to 0 for new players)
-        currentCurrency = PlayerPrefs.GetInt(CURRENCY_PREFS_KEY, 500);
-        UpdateCurrencyText();
-        
-        // Load purchased items
-        string purchasedItemsData = PlayerPrefs.GetString(PURCHASED_ITEMS_PREFS_KEY, "");
-        if (!string.IsNullOrEmpty(purchasedItemsData))
-        {
-            string[] purchasedIds = purchasedItemsData.Split(',');
-            foreach (var item in availableItems)
-            {
-                item.isPurchased = purchasedIds.Contains(item.id);
-            }
-        }
-
-        
-        LoadStats();
-    }
-
-    private void SavePurchasedItems()
-    {
-        string purchasedItemsData = string.Join(",", 
-            availableItems.Where(item => item.isPurchased).Select(item => item.id));
-        PlayerPrefs.SetString(PURCHASED_ITEMS_PREFS_KEY, purchasedItemsData);
-        PlayerPrefs.Save();
-    }
-
-    private void SaveStats()
-    {
-        PlayerPrefs.SetInt("MaxHP", StatsManager.Instance.maxHP);
-        PlayerPrefs.SetInt("Attack", StatsManager.Instance.attack);
-        PlayerPrefs.SetInt("Defense", StatsManager.Instance.defense);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadStats()
-    {
-        StatsManager.Instance.maxHP = PlayerPrefs.GetInt("MaxHP", StatsManager.Instance.maxHP);
-        StatsManager.Instance.attack = PlayerPrefs.GetInt("Attack", StatsManager.Instance.attack);
-        StatsManager.Instance.defense = PlayerPrefs.GetInt("Defense", StatsManager.Instance.defense);
-        StatsManager.Instance.currentHP = StatsManager.Instance.maxHP;
     }
 }

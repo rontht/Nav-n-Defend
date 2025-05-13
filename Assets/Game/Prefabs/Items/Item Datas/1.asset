@@ -16,7 +16,7 @@ MonoBehaviour:
   itemName: 
   description: 
   cost: 100
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 5b1107c6d2a0f904b8033227f55861b2, type: 3}
   type: 0
   value: 5
   isPurchased: 0
