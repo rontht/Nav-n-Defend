@@ -3,11 +3,18 @@ using UnityEngine.EventSystems;
 
 public class TreasureBoxDetection : MonoBehaviour
 {
+    private GameObject puzzleAnchor;
+
+    void OnEnable()
+    {
+        transform.parent = null;
+    }
+
     void Update()
     {
         if (Application.isMobilePlatform && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
-            // Ignore if user is tapping the box through UI
+            // ignore the tap if UI is in the way
             if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
                 return;
 
@@ -18,23 +25,28 @@ public class TreasureBoxDetection : MonoBehaviour
                 {
                     if (hit.transform == transform)
                     {
-                        Debug.Log($"{gameObject.name} tapped! Tap Version");
-                        PuzzleManager.Instance.StartPuzzle(transform.position);
-                        gameObject.SetActive(false);
+                        GameStart("Tap");
                     }
                 }
             }
         }
-        else
+        else if (Input.GetMouseButtonDown(0))
         {
-            // For testing in simulation
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Debug.Log($"{gameObject.name} tapped! Mouse Version");
-                PuzzleManager.Instance.StartPuzzle(transform.position);
-                gameObject.SetActive(false);
-            }
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            GameStart("Mouse");
         }
+    }
+
+    void GameStart(string text)
+    {
+        Debug.Log($"{gameObject.name} tapped! {text} Version");
+
+        // create an anchor at box location to make it indepedent of original box location
+        puzzleAnchor = new GameObject("PuzzleAnchor");
+        puzzleAnchor.transform.position = transform.position;
+
+        // create puzzle board with anchor's position in place of the box
+        PuzzleManager.Instance.StartPuzzle(puzzleAnchor.transform.position, puzzleAnchor.transform);
+        gameObject.SetActive(false);
     }
 }

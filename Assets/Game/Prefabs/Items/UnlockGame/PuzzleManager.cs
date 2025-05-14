@@ -8,6 +8,7 @@ public class PuzzleManager : MonoBehaviour
     [Header("Prefabs")]
     public GameObject nodePrefab;
     public GameObject gridPrefab;
+    public GameObject linePrefab;
 
     [Header("Game Configs")]
     public int tileCount = 5;
@@ -35,12 +36,15 @@ public class PuzzleManager : MonoBehaviour
         gridPieces = new GameObject[tileCount, tileCount];
     }
 
-    public void StartPuzzle(Vector3 origin)
+    public void StartPuzzle(Vector3 origin, Transform parent)
     {
         // cleanup the board and start spawning game objects
         CleanUpBoard();
-        SpawnTiles(origin);
-        SpawnNodes(nodeCount, origin);
+        SpawnTiles(origin, parent);
+        SpawnNodes(nodeCount, origin, parent);
+
+        // scaling for the board
+        transform.localScale = Vector3.one;
     }
 
     private void CleanUpBoard()
@@ -48,16 +52,14 @@ public class PuzzleManager : MonoBehaviour
         // wipe everything clean
         foreach (var node in nodes)
             Destroy(node);
-
         nodes.Clear();
-
         for (int i = 0; i < tileCount; i++)
             for (int j = 0; j < tileCount; j++)
                 if (gridPieces[i, j] != null)
                     Destroy(gridPieces[i, j]);
     }
 
-    private void SpawnTiles(Vector3 origin)
+    private void SpawnTiles(Vector3 origin, Transform parent)
     {
         // spawn a grid of tiles based on tileCount
         for (int i = 0; i < tileCount; i++)
@@ -67,11 +69,12 @@ public class PuzzleManager : MonoBehaviour
                 GameObject gridPiece = Instantiate(gridPrefab, position, Quaternion.identity);
                 gridPiece.name = $"Grid_{i}_{j}";
                 gridPiece.transform.localScale = new Vector3(tileSize, 0.1f, tileSize);
+                gridPiece.transform.parent = parent.transform;
                 gridPieces[i, j] = gridPiece;
             }
     }
 
-    private void SpawnNodes(int pairCount, Vector3 origin)
+    private void SpawnNodes(int pairCount, Vector3 origin, Transform parent)
     {
         // count available positions on the puzzle board
         List<Vector2Int> availablePositions = new List<Vector2Int>();
@@ -97,6 +100,7 @@ public class PuzzleManager : MonoBehaviour
 
                 // scale node to fit within the tile
                 node.transform.localScale = Vector3.one * (tileSize * 0.6f);
+                node.transform.parent = parent.transform;
 
                 // set the node color
                 node.GetComponent<Renderer>().material.color = pairColor;
