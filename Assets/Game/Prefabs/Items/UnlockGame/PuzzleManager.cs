@@ -8,7 +8,6 @@ public class PuzzleManager : MonoBehaviour
     [Header("Prefabs")]
     public GameObject nodePrefab;
     public GameObject gridPrefab;
-    public GameObject linePrefab;
 
     [Header("Game Configs")]
     public int tileCount = 5;
@@ -18,7 +17,8 @@ public class PuzzleManager : MonoBehaviour
 
     private GameObject[,] gridPieces;
     private List<GameObject> nodes;
-    private GameObject selectedNode;
+    private GameObject startingNode;
+    private List<Vector2Int> connectingPath = new List<Vector2Int>();
 
     private void Awake()
     {
@@ -99,7 +99,7 @@ public class PuzzleManager : MonoBehaviour
                 node.name = $"Node_{pair}_{n}";
 
                 // scale node to fit within the tile
-                node.transform.localScale = Vector3.one * (tileSize * 0.6f);
+                node.transform.localScale = Vector3.one * (tileSize * 0.5f);
                 node.transform.parent = parent.transform;
 
                 // set the node color
@@ -111,53 +111,130 @@ public class PuzzleManager : MonoBehaviour
 
     private void Update()
     {
-        if (Application.isMobilePlatform && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        // for mobile AR touch
+        if (Application.isMobilePlatform && Input.touchCount > 0)
         {
-            HandleTouch(Input.GetTouch(0).position);
+            Touch touch = Input.GetTouch(0);
+            if (touch.phase == TouchPhase.Began)
+                HandleTouch(touch.position);
+            else if (touch.phase == TouchPhase.Moved)
+                UpdateTileHighlight(touch.position);
+            else if (touch.phase == TouchPhase.Ended)
+                ResetTile();
         }
+        // for testing in simulator
         else if (Input.GetMouseButtonDown(0))
-        {
             HandleTouch(Input.mousePosition);
-        }
+        else if (Input.GetMouseButton(0))
+            UpdateTileHighlight(Input.mousePosition);
+        else if (Input.GetMouseButtonUp(0))
+            ResetTile();
     }
 
     private void HandleTouch(Vector3 screenPosition)
     {
         Ray ray = Camera.main.ScreenPointToRay(screenPosition);
         if (Physics.Raycast(ray, out RaycastHit hit))
-        {
             if (nodes.Contains(hit.transform.gameObject))
+                startingNode = hit.transform.gameObject;
+    }
+
+    private bool checkIfAdjacent(Vector2Int a, Vector2Int b)
+    {
+        int dx = Mathf.Abs(a.x - b.x);
+        int dz = Mathf.Abs(a.y - b.y);
+        return (dx == 1 && dz == 0) || (dx == 0 && dz == 1);
+    }
+
+    private void UpdateTileHighlight(Vector3 screenPosition)
+    {
+        // reset if no node is selected
+        if (startingNode == null || !startingNode)
+            return;
+
+        Ray ray = Camera.main.ScreenPointToRay(screenPosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            GameObject currentTile = hit.transform.gameObject;
+
+            if (currentTile.name.StartsWith("Grid_"))
             {
-                GameObject tappedNode = hit.transform.gameObject;
-                OnNodeTapped(tappedNode);
+                // get coordinates of currently touched tile
+                string[] parts = currentTile.name.Split('_');
+                int x = int.Parse(parts[1]);
+                int z = int.Parse(parts[2]);
+                Vector2Int currentPos = new Vector2Int(x, z);
+
+                // check if current tile is second most recent tile
+                if (connectingPath.Count > 1)
+                {
+                    Vector2Int previousPos = connectingPath[connectingPath.Count - 2];
+                    if (currentPos == previousPos)
+                    {
+                        // de-highlight the tile most recent tile
+                        Vector2Int lastPos = connectingPath[connectingPath.Count - 1];
+                        GameObject lastTile = gridPieces[lastPos.x, lastPos.y];
+                        if (lastTile != null)
+                            lastTile.GetComponent<Renderer>().material.color = Color.white;
+
+                        connectingPath.RemoveAt(connectingPath.Count - 1);
+                        return;
+                    }
+                }
+
+                // for next tile check if adjacent
+                if (connectingPath.Count > 0)
+                {
+                    Vector2Int lastPos = connectingPath[connectingPath.Count - 1];
+                    if (!checkIfAdjacent(lastPos, currentPos))
+                        return;
+                }
+
+                // highlight the tile
+                if (!connectingPath.Contains(currentPos))
+                {
+                    Renderer tileRenderer = currentTile.GetComponent<Renderer>();
+                    Color highlightColor = startingNode.GetComponent<Renderer>().material.color;
+                    tileRenderer.material.color = highlightColor;
+                    connectingPath.Add(currentPos);
+                }
+            }
+            // check if current tile contains a node of same color as starting node
+            else if (nodes.Contains(currentTile) && currentTile != startingNode)
+            {
+                if (MatchNodes(startingNode, currentTile))
+                {
+                    // remove the matching pair
+                    nodes.Remove(startingNode);
+                    nodes.Remove(currentTile);
+                    Destroy(startingNode);
+                    Destroy(currentTile);
+
+                    // reset the tile effects
+                    ResetTile();
+
+                    Debug.Log($"Nodes matched and removed.");
+                }
+                else
+                {
+                    // reset the path if blocked by different colored nodes
+                    ResetTile();
+                    Debug.Log("Blocked by a different node.");
+                }
             }
         }
     }
 
-    private void OnNodeTapped(GameObject tappedNode)
+    private void ResetTile()
     {
-        if (selectedNode == null)
+        foreach (Vector2Int pos in connectingPath)
         {
-            // First node tapped, select it
-            selectedNode = tappedNode;
-            Debug.Log($"Node Selected: {tappedNode.name}");
+            GameObject tile = gridPieces[pos.x, pos.y];
+            if (tile != null)
+                tile.GetComponent<Renderer>().material.color = Color.white;
         }
-        else
-        {
-            // Second node tapped, check if they match
-            if (MatchNodes(selectedNode, tappedNode))
-            {
-                Debug.Log("Matched!");
-                selectedNode.SetActive(false);
-                tappedNode.SetActive(false);
-            }
-            else
-            {
-                Debug.Log("Not a match!");
-            }
-
-            selectedNode = null;
-        }
+        connectingPath.Clear();
+        startingNode = null;
     }
 
     private bool MatchNodes(GameObject node1, GameObject node2)

@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
 using UnityEngine;
-using UnityEngine;
 
 public class EnemyMover : MonoBehaviour
 {
