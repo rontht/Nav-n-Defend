@@ -4,6 +4,14 @@ using UnityEngine.EventSystems;
 public class TreasureBoxDetection : MonoBehaviour
 {
     private GameObject puzzleAnchor;
+    private static TreasureBoxDetection instance;
+
+    void Awake()
+    {
+        // Ensure only one instance is managed
+        if (instance == null)
+            instance = this;
+    }
 
     void OnEnable()
     {
@@ -39,7 +47,7 @@ public class TreasureBoxDetection : MonoBehaviour
 
     void GameStart(string text)
     {
-        Debug.Log($"{gameObject.name} tapped! {text} Version");
+        Debug.Log($"{instance.gameObject.name} tapped! {text} Version");
 
         // create an anchor at box location to make it indepedent of original box location
         puzzleAnchor = new GameObject("PuzzleAnchor");
@@ -47,6 +55,14 @@ public class TreasureBoxDetection : MonoBehaviour
 
         // create puzzle board with anchor's position in place of the box
         PuzzleManager.Instance.StartPuzzle(puzzleAnchor.transform.position, puzzleAnchor.transform);
-        gameObject.SetActive(false);
+        instance.gameObject.SetActive(false);
+    }
+
+    public static void GameEnd()
+    {
+        if (instance != null)
+        {
+            instance.gameObject.SetActive(true);
+        }
     }
 }

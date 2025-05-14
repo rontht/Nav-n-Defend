@@ -26,7 +26,6 @@ public class PuzzleManager : MonoBehaviour
             Destroy(gameObject);
         else
             Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -45,9 +44,13 @@ public class PuzzleManager : MonoBehaviour
 
         // scaling for the board
         transform.localScale = Vector3.one;
+
+        PuzzleUIManager uiManager = FindObjectOfType<PuzzleUIManager>();
+            if (uiManager != null)
+                uiManager.StartPuzzle(nodeCount);
     }
 
-    private void CleanUpBoard()
+    public void CleanUpBoard()
     {
         // wipe everything clean
         foreach (var node in nodes)
@@ -210,6 +213,11 @@ public class PuzzleManager : MonoBehaviour
                     Destroy(startingNode);
                     Destroy(currentTile);
 
+                    // notify UI
+                    PuzzleUIManager uiManager = FindObjectOfType<PuzzleUIManager>();
+                    if (uiManager != null)
+                        uiManager.UpdateScore();
+
                     // reset the tile effects
                     ResetTile();
 
@@ -225,7 +233,7 @@ public class PuzzleManager : MonoBehaviour
         }
     }
 
-    private void ResetTile()
+    public void ResetTile()
     {
         foreach (Vector2Int pos in connectingPath)
         {
