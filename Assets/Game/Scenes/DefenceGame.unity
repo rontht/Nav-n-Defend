@@ -1229,11 +1229,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04873143d0735a342b6122e46cdd9c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  imageManager: {fileID: 1851427687}
-  trackedPrefab: {fileID: 1450807614401276724, guid: f40eccb20a6fa534fa25860c08b399af,
-    type: 3}
-  objectToSpawn: {fileID: 3993699548412915053, guid: 7d7128a985e04e94c91d4f23f9028781,
-    type: 3}
 --- !u!4 &841877590
 Transform:
   m_ObjectHideFlags: 0
@@ -1756,37 +1751,6 @@ Transform:
   - {fileID: 2123520004}
   m_Father: {fileID: 1851427686}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1363285102
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1363285104}
-  m_Layer: 0
-  m_Name: Toggle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1363285104
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1363285102}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -13.828174, y: -6.2210493, z: -11.050039}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1517478663
 GameObject:
   m_ObjectHideFlags: 0
@@ -2216,7 +2180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa17d122634046b4a8e23048891fafc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RaycastPrefab: {fileID: 0}
+  m_RaycastPrefab: {fileID: 1851427683}
 --- !u!1 &1985205551
 GameObject:
   m_ObjectHideFlags: 0
@@ -2472,4 +2436,3 @@ SceneRoots:
   - {fileID: 645163539}
   - {fileID: 739587946}
   - {fileID: 841877590}
-  - {fileID: 1363285104}
