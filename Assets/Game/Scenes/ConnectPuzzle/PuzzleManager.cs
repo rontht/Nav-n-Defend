@@ -22,10 +22,10 @@ public class PuzzleManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-            Destroy(gameObject);
-        else
+        if (Instance == null)
             Instance = this;
+        else
+            Destroy(gameObject); // Destroy duplicate instances
     }
 
     private void Start()

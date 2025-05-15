@@ -880,7 +880,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 917528418}
-  - component: {fileID: 917528417}
+  - component: {fileID: 917528419}
   m_Layer: 0
   m_Name: StatsManager
   m_TagString: Untagged
@@ -888,22 +888,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &917528417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 917528416}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa14f1d216c517541881bc5c1acb3d92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHP: 100
-  currentHP: 45
-  attack: 10
-  defense: 5
 --- !u!4 &917528418
 Transform:
   m_ObjectHideFlags: 0
@@ -919,6 +903,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 208432449}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &917528419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 917528416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f29197cb47b40a94b9e43e30103dcbff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMaxHP: 100
+  baseAttack: 10
+  baseDefense: 5
+  startingCoins: 50
+  _maxHP: 0
+  _currentHP: 0
+  _attack: 0
+  _defense: 0
+  _coins: 0
 --- !u!1 &1099489474 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8848211010957873013, guid: 53cbb16e7e5a34c4fba3d07f471bbe10,

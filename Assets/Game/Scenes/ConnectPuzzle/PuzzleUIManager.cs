@@ -9,6 +9,10 @@ public class PuzzleUIManager : MonoBehaviour
     public Button backButton;
     public Button finishButton;
     public GameObject winPanel;
+    public GameObject scanUI;
+
+    [Header("Game Configs")]
+    public int expReward = 3;
 
     private int currentScore = 0;
     private int maxScore;
@@ -34,6 +38,7 @@ public class PuzzleUIManager : MonoBehaviour
         backButton.gameObject.SetActive(true);
         winPanel.SetActive(false);
         isPuzzleActive = true;
+        scanUI.SetActive(false);
     }
 
     public void UpdateScore()
@@ -48,6 +53,9 @@ public class PuzzleUIManager : MonoBehaviour
             scoreText.gameObject.SetActive(false);
             backButton.gameObject.SetActive(false);
             winPanel.SetActive(true);
+
+            PlayerStats.Instance.GainExperience(expReward);
+            Debug.Log($"You've gained {expReward} EXP for completing the puzzle.");
         }
     }
 
@@ -63,6 +71,7 @@ public class PuzzleUIManager : MonoBehaviour
         backButton.gameObject.SetActive(false);
         winPanel.SetActive(false);
         isPuzzleActive = false;
+        scanUI.SetActive(true);
 
         // Reset the puzzle board
         PuzzleManager.Instance.ResetTile();

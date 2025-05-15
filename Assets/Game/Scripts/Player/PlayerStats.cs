@@ -28,6 +28,9 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int baseAttack = 10;
     [SerializeField] private int baseDefense = 5;
     [SerializeField] private int startingCoins = 50;
+    [SerializeField] private int startingLevel = 1;
+    [SerializeField] private int startingExp = 0;
+    [SerializeField] private int startingExpToLevelUp = 0;
 
     [Header("Current Stats")]
     [SerializeField] private int _maxHP;
@@ -35,6 +38,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int _attack;
     [SerializeField] private int _defense;
     [SerializeField] private int _coins;
+    [SerializeField] private int _level;
+    [SerializeField] private int _currentExp;
+    [SerializeField] private int _expToLevelUp;
+    [SerializeField] private float _expGrowthMultiplier;
+
 
     // Public read-only properties
     public int maxHP => _maxHP;
@@ -42,6 +50,9 @@ public class PlayerStats : MonoBehaviour
     public int attack => _attack;
     public int defense => _defense;
     public int coins => _coins;
+    public int currentExp => _currentExp;
+    public int expToLevelUp => _expToLevelUp;
+    public int level => _level;
 
     // List to store the IDs of purchased items
     private List<string> purchasedItemIDs = new List<string>();
@@ -53,10 +64,13 @@ public class PlayerStats : MonoBehaviour
     private const string ATK_KEY = "PlayerAttack";
     private const string DEF_KEY = "PlayerDefense";
     private const string PURCHASED_ITEMS_KEY = "PurchasedItems";
+    private const string LEVEL_KEY = "PlayerLevel";
+    private const string EXP_KEY = "PlayerExp";
+    private const string EXP_TO_LEVEL_KEY = "PlayerExpToLevelUp";
 
     // Events for UI updates
     public event Action onCoinsChanged;
-    public event Action onStatsChanged;    
+    public event Action onStatsChanged;
     /// <summary>
     /// Initializes the singleton instance and loads saved stats.
     /// Ensures only one PlayerStats exists in the game.
@@ -68,12 +82,13 @@ public class PlayerStats : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject); // Make this object persistent across scenes
             LoadStats();
+            Debug.Log("PlayerStats Initialized in MainMenu");
         }
         else
         {
             Destroy(gameObject); // Destroy duplicate instances
         }
-    }    
+    }
 
     /// <summary>
     /// Checks if the player has enough coins for a purchase
@@ -112,7 +127,8 @@ public class PlayerStats : MonoBehaviour
         Debug.Log($"Added {amount} coins. Total: {_coins}");
         SaveStats();
         onCoinsChanged?.Invoke();
-    }    
+    }
+
     /// <summary>
     /// Increases a specific stat by the given amount and updates the player state
     /// For HP increases, maintains the same health percentage after the increase
@@ -142,10 +158,13 @@ public class PlayerStats : MonoBehaviour
         }
         SaveStats();
         onStatsChanged?.Invoke();
-    }    public bool IsItemPurchased(string itemID)
+    }
+
+    public bool IsItemPurchased(string itemID)
     {
         return purchasedItemIDs.Contains(itemID);
-    }    
+    }
+
     /// <summary>
     /// Saves all player stats and purchased items to PlayerPrefs for persistence between sessions.
     /// Called automatically after any stat changes or purchases.
@@ -157,13 +176,18 @@ public class PlayerStats : MonoBehaviour
         PlayerPrefs.SetInt(CURRENT_HP_KEY, _currentHP);
         PlayerPrefs.SetInt(ATK_KEY, _attack);
         PlayerPrefs.SetInt(DEF_KEY, _defense);
+        PlayerPrefs.SetInt(LEVEL_KEY, _level);
+        PlayerPrefs.SetInt(EXP_KEY, _currentExp);
+        PlayerPrefs.SetInt(EXP_TO_LEVEL_KEY, _expToLevelUp);
 
         string purchasedItemsString = string.Join(",", purchasedItemIDs);
         PlayerPrefs.SetString(PURCHASED_ITEMS_KEY, purchasedItemsString);
 
         PlayerPrefs.Save();
-        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, DEF: {_defense}, Coins: {_coins}");
-    }    public void LoadStats()
+        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, DEF: {_defense}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}");
+    }
+
+    public void LoadStats()
     {
         // Load with default values if keys don't exist
         _coins = PlayerPrefs.GetInt(COINS_KEY, startingCoins);
@@ -171,6 +195,9 @@ public class PlayerStats : MonoBehaviour
         _currentHP = PlayerPrefs.GetInt(CURRENT_HP_KEY, _maxHP);
         _attack = PlayerPrefs.GetInt(ATK_KEY, baseAttack);
         _defense = PlayerPrefs.GetInt(DEF_KEY, baseDefense);
+        _level = PlayerPrefs.GetInt(LEVEL_KEY, startingLevel);
+        _currentExp = PlayerPrefs.GetInt(EXP_KEY, startingExp);
+        _expToLevelUp = PlayerPrefs.GetInt(EXP_TO_LEVEL_KEY, startingExpToLevelUp);
 
         string purchasedItemsString = PlayerPrefs.GetString(PURCHASED_ITEMS_KEY, "");
         if (!string.IsNullOrEmpty(purchasedItemsString))
@@ -187,7 +214,8 @@ public class PlayerStats : MonoBehaviour
         // Notify UI of loaded stats
         onCoinsChanged?.Invoke();
         onStatsChanged?.Invoke();
-    }    
+    }
+
     /// <summary>
     /// Recalculates all player stats based on base values and purchased items.
     /// Maintains the current health percentage when recalculating max HP.
@@ -231,7 +259,9 @@ public class PlayerStats : MonoBehaviour
         Debug.Log($"Stats recalculated. HP: {_currentHP}/{_maxHP}, ATK: {_attack}, DEF: {_defense}");
         SaveStats();
         onStatsChanged?.Invoke();
-    }    public bool HasPurchasedItem(string itemId)
+    }
+
+    public bool HasPurchasedItem(string itemId)
     {
         return purchasedItemIDs.Contains(itemId);
     }
@@ -257,8 +287,71 @@ public class PlayerStats : MonoBehaviour
     private void LoadPurchasedItems()
     {
         string purchasedItemsStr = PlayerPrefs.GetString(PURCHASED_ITEMS_KEY, "");
-        purchasedItemIDs = string.IsNullOrEmpty(purchasedItemsStr) 
-            ? new List<string>() 
+        purchasedItemIDs = string.IsNullOrEmpty(purchasedItemsStr)
+            ? new List<string>()
             : purchasedItemsStr.Split(',').ToList();
+    }
+
+
+
+
+
+    /// <summary>
+    /// Experience and Leveling Methods
+    /// </summary>
+    public void GainExperience(int amount)
+    {
+        if (amount <= 0) return;
+
+        _currentExp += amount;
+        Debug.Log($"Gained {amount} EXP. Current EXP: {_currentExp}/{_expToLevelUp}");
+
+        while (_currentExp >= _expToLevelUp)
+        {
+            LevelUp();
+        }
+
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    private void LevelUp()
+    {
+        _level++;
+        _currentExp -= _expToLevelUp;
+        _expToLevelUp = Mathf.RoundToInt(_expToLevelUp * _expGrowthMultiplier);
+
+        Debug.Log($"Leveled up! New Level: {_level}, EXP to next level: {_expToLevelUp}");
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+    public int GetCurrentLevel()
+    {
+        return _level;
+    }
+
+    public int GetCurrentExperience()
+    {
+        return _currentExp;
+    }
+
+    public int GetExpToNextLevel()
+    {
+        return _expToLevelUp;
+    }
+
+    // For testing
+    public void TakeDamage(int amount)
+    {
+        _currentHP = Mathf.Max(0, _currentHP - amount);
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    public void Heal(int amount)
+    {
+        _currentHP = Mathf.Min(_maxHP, _currentHP + amount);
+        SaveStats();
+        onStatsChanged?.Invoke();
     }
 }
