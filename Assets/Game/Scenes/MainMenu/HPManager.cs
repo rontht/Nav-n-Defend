@@ -16,18 +16,6 @@ public class HPManager : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            PlayerStats.Instance.TakeDamage(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.I))
-        {
-            PlayerStats.Instance.Heal(1);
-        }
-    }
-
     private void OnDestroy()
     {
         if (PlayerStats.Instance != null)

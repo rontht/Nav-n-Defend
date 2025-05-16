@@ -30,7 +30,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int startingCoins = 50;
     [SerializeField] private int startingLevel = 1;
     [SerializeField] private int startingExp = 0;
-    [SerializeField] private int startingExpToLevelUp = 0;
+    [SerializeField] private int startingExpToLevelUp = 10;
+    [SerializeField] private int maxLevel = 100;
 
     [Header("Current Stats")]
     [SerializeField] private int _maxHP;
@@ -41,7 +42,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int _level;
     [SerializeField] private int _currentExp;
     [SerializeField] private int _expToLevelUp;
-    [SerializeField] private float _expGrowthMultiplier;
 
 
     // Public read-only properties
@@ -88,6 +88,11 @@ public class PlayerStats : MonoBehaviour
         {
             Destroy(gameObject); // Destroy duplicate instances
         }
+    }
+
+    private void Update()
+    {
+        TestStats();
     }
 
     /// <summary>
@@ -209,11 +214,30 @@ public class PlayerStats : MonoBehaviour
             purchasedItemIDs = new List<string>();
         }
 
-        Debug.Log("Player stats and purchased items loaded.");
+        // Debug.Log("Player stats and purchased items loaded.");
 
         // Notify UI of loaded stats
         onCoinsChanged?.Invoke();
         onStatsChanged?.Invoke();
+    }
+
+    public void ResetStats()
+    {
+        _maxHP = baseMaxHP;
+        _currentHP = baseMaxHP;
+        _attack = baseAttack;
+        _defense = baseDefense;
+        _coins = startingCoins;
+        _level = startingLevel;
+        _currentExp = startingExp;
+        _expToLevelUp = startingExpToLevelUp;
+        // purchasedItemIDs.Clear(); // Remove all purchased items
+
+        SaveStats(); // Save the reset stats to PlayerPrefs
+        onCoinsChanged?.Invoke();
+        onStatsChanged?.Invoke();
+
+        Debug.Log("Player stats have been reset to default values.");
     }
 
     /// <summary>
@@ -297,15 +321,21 @@ public class PlayerStats : MonoBehaviour
 
 
     /// <summary>
-    /// Experience and Leveling Methods
+    /// Experience and Leveling Methods, 
     /// </summary>
     public void GainExperience(int amount)
     {
         if (amount <= 0) return;
+        
+        // if under level cap, add exp
+        if (_level < maxLevel)
+        {
+            _currentExp += amount;
+        }
 
-        _currentExp += amount;
         Debug.Log($"Gained {amount} EXP. Current EXP: {_currentExp}/{_expToLevelUp}");
 
+        // if exceed exp cap, level up
         while (_currentExp >= _expToLevelUp)
         {
             LevelUp();
@@ -317,30 +347,20 @@ public class PlayerStats : MonoBehaviour
 
     private void LevelUp()
     {
-        _level++;
+        // level up and remove exp
         _currentExp -= _expToLevelUp;
-        _expToLevelUp = Mathf.RoundToInt(_expToLevelUp * _expGrowthMultiplier);
-
+        _level++;
         Debug.Log($"Leveled up! New Level: {_level}, EXP to next level: {_expToLevelUp}");
+
+        // reset the exp to 0
+        if (_level >= maxLevel)
+        {
+            _currentExp = 0;
+        }
         SaveStats();
         onStatsChanged?.Invoke();
     }
-    public int GetCurrentLevel()
-    {
-        return _level;
-    }
 
-    public int GetCurrentExperience()
-    {
-        return _currentExp;
-    }
-
-    public int GetExpToNextLevel()
-    {
-        return _expToLevelUp;
-    }
-
-    // For testing
     public void TakeDamage(int amount)
     {
         _currentHP = Mathf.Max(0, _currentHP - amount);
@@ -353,5 +373,26 @@ public class PlayerStats : MonoBehaviour
         _currentHP = Mathf.Min(_maxHP, _currentHP + amount);
         SaveStats();
         onStatsChanged?.Invoke();
+    }
+
+    // For testing
+    public void TestStats()
+    {
+        if (Input.GetKeyDown(KeyCode.Keypad7))
+        {
+            Instance.TakeDamage(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad8))
+        {
+            Instance.Heal(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad9))
+        {
+            Instance.GainExperience(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Keypad0))
+        {
+            Instance.ResetStats();
+        }
     }
 }

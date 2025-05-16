@@ -35,19 +35,19 @@ public class PuzzleManager : MonoBehaviour
         gridPieces = new GameObject[tileCount, tileCount];
     }
 
-    public void StartPuzzle(Vector3 origin, Transform parent)
+    public void StartPuzzle(Vector3 origin)
     {
         // cleanup the board and start spawning game objects
         CleanUpBoard();
-        SpawnTiles(origin, parent);
-        SpawnNodes(nodeCount, origin, parent);
+        SpawnTiles(origin);
+        SpawnNodes(nodeCount, origin);
 
         // scaling for the board
         transform.localScale = Vector3.one;
 
         PuzzleUIManager uiManager = FindObjectOfType<PuzzleUIManager>();
-            if (uiManager != null)
-                uiManager.StartPuzzle(nodeCount);
+        if (uiManager != null)
+            uiManager.StartPuzzle(nodeCount);
     }
 
     public void CleanUpBoard()
@@ -62,7 +62,7 @@ public class PuzzleManager : MonoBehaviour
                     Destroy(gridPieces[i, j]);
     }
 
-    private void SpawnTiles(Vector3 origin, Transform parent)
+    private void SpawnTiles(Vector3 origin)
     {
         // spawn a grid of tiles based on tileCount
         for (int i = 0; i < tileCount; i++)
@@ -72,12 +72,11 @@ public class PuzzleManager : MonoBehaviour
                 GameObject gridPiece = Instantiate(gridPrefab, position, Quaternion.identity);
                 gridPiece.name = $"Grid_{i}_{j}";
                 gridPiece.transform.localScale = new Vector3(tileSize, 0.1f, tileSize);
-                gridPiece.transform.parent = parent.transform;
                 gridPieces[i, j] = gridPiece;
             }
     }
 
-    private void SpawnNodes(int pairCount, Vector3 origin, Transform parent)
+    private void SpawnNodes(int pairCount, Vector3 origin)
     {
         // count available positions on the puzzle board
         List<Vector2Int> availablePositions = new List<Vector2Int>();
@@ -103,7 +102,6 @@ public class PuzzleManager : MonoBehaviour
 
                 // scale node to fit within the tile
                 node.transform.localScale = Vector3.one * (tileSize * 0.5f);
-                node.transform.parent = parent.transform;
 
                 // set the node color
                 node.GetComponent<Renderer>().material.color = pairColor;
@@ -114,9 +112,9 @@ public class PuzzleManager : MonoBehaviour
 
     private void Update()
     {
-        // for mobile AR touch
         if (Application.isMobilePlatform && Input.touchCount > 0)
         {
+            // for mobile AR touch
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
                 HandleTouch(touch.position);
@@ -125,13 +123,16 @@ public class PuzzleManager : MonoBehaviour
             else if (touch.phase == TouchPhase.Ended)
                 ResetTile();
         }
-        // for testing in simulator
-        else if (Input.GetMouseButtonDown(0))
-            HandleTouch(Input.mousePosition);
-        else if (Input.GetMouseButton(0))
-            UpdateTileHighlight(Input.mousePosition);
-        else if (Input.GetMouseButtonUp(0))
-            ResetTile();
+        else
+        {
+            // for testing in simulator
+            if (Input.GetMouseButtonDown(0))
+                HandleTouch(Input.mousePosition);
+            else if (Input.GetMouseButton(0))
+                UpdateTileHighlight(Input.mousePosition);
+            else if (Input.GetMouseButtonUp(0))
+                ResetTile();
+        }
     }
 
     private void HandleTouch(Vector3 screenPosition)

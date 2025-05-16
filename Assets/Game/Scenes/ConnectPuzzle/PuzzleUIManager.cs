@@ -53,6 +53,7 @@ public class PuzzleUIManager : MonoBehaviour
             scoreText.gameObject.SetActive(false);
             backButton.gameObject.SetActive(false);
             winPanel.SetActive(true);
+            isPuzzleActive = false;
 
             PlayerStats.Instance.GainExperience(expReward);
             Debug.Log($"You've gained {expReward} EXP for completing the puzzle.");

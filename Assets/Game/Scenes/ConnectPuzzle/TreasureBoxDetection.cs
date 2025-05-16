@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 
 public class TreasureBoxDetection : MonoBehaviour
 {
-    private GameObject puzzleAnchor;
     private static TreasureBoxDetection instance;
 
     void Awake()
@@ -11,58 +10,58 @@ public class TreasureBoxDetection : MonoBehaviour
         // Ensure only one instance is managed
         if (instance == null)
             instance = this;
-    }
-
-    void OnEnable()
-    {
-        transform.parent = null;
+        else
+            Destroy(gameObject);
     }
 
     void Update()
     {
-        if (Application.isMobilePlatform && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        if (Application.isMobilePlatform)
         {
-            // ignore the tap if UI is in the way
-            if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-                return;
-
             if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
+                // ignore tap on box if UI is in the way
+                if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId)) return;
+
+                // if ray cast hit the box
                 Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
                 {
-                    if (hit.transform == transform)
-                    {
-                        GameStart("Tap");
-                    }
+                    GameStart();
                 }
             }
         }
         else if (Input.GetMouseButtonDown(0))
         {
+            // ignore tap on box if UI is in the way
+            if (EventSystem.current.IsPointerOverGameObject()) return;
+
+            // if ray cast hit the box
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            GameStart("Mouse");
+            if (Physics.Raycast(ray, out RaycastHit hit) && hit.transform == transform)
+            {
+                GameStart();
+            }
         }
     }
 
-    void GameStart(string text)
+    void GameStart()
     {
-        Debug.Log($"{instance.gameObject.name} tapped! {text} Version");
+        Debug.Log($"{instance.gameObject.name} tapped!");
 
-        // create an anchor at box location to make it indepedent of original box location
-        puzzleAnchor = new GameObject("PuzzleAnchor");
-        puzzleAnchor.transform.position = transform.position;
+        // Create an anchor at the box location to make it independent of the original box location
+        // GameObject anchor = new GameObject("PuzzleAnchor");
+        // anchor.transform.position = transform.position;
 
-        // create puzzle board with anchor's position in place of the box
-        PuzzleManager.Instance.StartPuzzle(puzzleAnchor.transform.position, puzzleAnchor.transform);
+        // Create puzzle board with anchor's position in place of the box
+        // PuzzleManager.Instance.StartPuzzle(anchor.transform.position, anchor.transform);
+        PuzzleManager.Instance.StartPuzzle(transform.position);
         instance.gameObject.SetActive(false);
     }
 
     public static void GameEnd()
     {
         if (instance != null)
-        {
             instance.gameObject.SetActive(true);
-        }
     }
 }
