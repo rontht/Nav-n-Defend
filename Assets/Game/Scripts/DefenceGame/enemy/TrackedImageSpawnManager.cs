@@ -21,7 +21,7 @@ public class TrackedImageSpawnManager : MonoBehaviour
         }
         else
         {
-            UnityEngine.Debug.LogWarning("Spawn points or enemy prefab not assigned.");
+            //UnityEngine.Debug.LogWarning("Spawn points or enemy prefab not assigned.");
         }
     }
 
@@ -52,6 +52,6 @@ public class TrackedImageSpawnManager : MonoBehaviour
             mover.SetTarget(transform); 
         }
 
-        UnityEngine.Debug.Log($"Spawned enemy {spawnCount + 1} at {spawnPoint.name}");
+        //UnityEngine.Debug.Log($"Spawned enemy {spawnCount + 1} at {spawnPoint.name}");
     }
 }
