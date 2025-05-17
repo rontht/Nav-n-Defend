@@ -18,7 +18,7 @@ public class CenterTriggerDamage : MonoBehaviour
                 health.TakeDamage(damageAmount);
             }
 
-            Destroy(root); // Destroy entire enemy
+            Destroy(root); // Removes entity that had contact.
         }
     }
 }

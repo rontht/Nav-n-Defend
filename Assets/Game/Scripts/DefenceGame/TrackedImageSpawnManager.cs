@@ -27,6 +27,8 @@ public class TrackedImageSpawnManager : MonoBehaviour
 
     private IEnumerator SpawnRoutine()
     {
+        yield return new WaitForSeconds(10f);
+
         while (spawnCount < maxSpawns)
         {
             SpawnEnemy();
@@ -47,7 +49,7 @@ public class TrackedImageSpawnManager : MonoBehaviour
         EnemyMover mover = enemy.GetComponent<EnemyMover>();
         if (mover != null)
         {
-            mover.SetTarget(transform);  // Target the prefab's center
+            mover.SetTarget(transform); 
         }
 
         UnityEngine.Debug.Log($"Spawned enemy {spawnCount + 1} at {spawnPoint.name}");
