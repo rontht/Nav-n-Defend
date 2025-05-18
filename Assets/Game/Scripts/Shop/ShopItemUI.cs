@@ -3,16 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit;
 
-/// <summary>
-/// Controls the UI for individual shop items:
-/// - Displays item info (name, cost, description)
-/// - Handles purchase button interactions
-/// - Updates visual state (purchased/available)
-/// - Supports both regular and XR interaction
-/// - Responds to player currency changes
-/// 
-/// Attach this component to each shop item card/button in the shop UI.
-/// </summary>
+/// Controls the UI for individual shop items.
 public class ShopItemUI : MonoBehaviour
 {
     [Header("Item Configuration")]
@@ -45,7 +36,6 @@ public class ShopItemUI : MonoBehaviour
         InitializeUI();
         UpdateUI();
         
-        // Added: Add listener for the purchase button's onClick event
         if (purchaseButton != null)
         {
             purchaseButton.onClick.AddListener(OnPurchaseClicked);
@@ -64,12 +54,7 @@ public class ShopItemUI : MonoBehaviour
         {
             Debug.LogWarning("PlayerStats.Instance is null, cannot add listeners");
         }
-    }    /// <summary>
-    /// Sets up the initial UI state for the shop item:
-    /// - Sets the item icon and color
-    /// - Configures the description text with item details
-    /// Called once during Start
-    /// </summary>
+    }    /// Sets up the initial UI state for the shop item.
     private void InitializeUI()
     {
         if (iconImage != null) 
@@ -83,13 +68,7 @@ public class ShopItemUI : MonoBehaviour
             descriptionText.text = $"{itemData.description}\n+{itemData.value} {itemData.type}";
         }
     }    
-    /// <summary>
-    /// Handles the purchase button click or XR selection:
-    /// - Validates item data and manager references
-    /// - Checks if item can be purchased
-    /// - Shows purchase confirmation dialog
-    /// Called by button click or XR interaction
-    /// </summary>
+    /// Handles the purchase button click or XR selection.
     public void OnPurchaseClicked()
     {
         Debug.Log($"OnPurchaseClicked for item: {itemData?.itemName ?? "NULL ITEM"}");
@@ -119,13 +98,7 @@ public class ShopItemUI : MonoBehaviour
     {
         OnPurchaseClicked();
     }    
-    /// <summary>
-    /// Updates the item's UI state based on:
-    /// - Purchase status (changes color and button state if purchased)
-    /// - Affordability (disables button if player can't afford)
-    /// - XR interaction state
-    /// Called automatically when player stats or currency changes
-    /// </summary>
+    /// Updates the item's UI state.
     private void UpdateUI()
     {
         if (itemData == null) return;
@@ -160,7 +133,7 @@ public class ShopItemUI : MonoBehaviour
         {
             xrInteractable.selectEntered.RemoveListener(OnXRSelectEntered);
         }
-        // Added: Remove listener for the purchase button's onClick event
+        
         if (purchaseButton != null)
         {
             purchaseButton.onClick.RemoveListener(OnPurchaseClicked);
