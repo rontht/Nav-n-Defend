@@ -45,6 +45,16 @@ public class ShopItemUI : MonoBehaviour
         InitializeUI();
         UpdateUI();
         
+        // Added: Add listener for the purchase button's onClick event
+        if (purchaseButton != null)
+        {
+            purchaseButton.onClick.AddListener(OnPurchaseClicked);
+        }
+        else
+        {
+            Debug.LogWarning("Purchase Button reference is missing on " + gameObject.name + ", cannot add onClick listener.");
+        }
+        
         if (PlayerStats.Instance != null)
         {
             PlayerStats.Instance.onCoinsChanged += UpdateUI;
@@ -149,6 +159,11 @@ public class ShopItemUI : MonoBehaviour
         if (xrInteractable != null)
         {
             xrInteractable.selectEntered.RemoveListener(OnXRSelectEntered);
+        }
+        // Added: Remove listener for the purchase button's onClick event
+        if (purchaseButton != null)
+        {
+            purchaseButton.onClick.RemoveListener(OnPurchaseClicked);
         }
     }
 }

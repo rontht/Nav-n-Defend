@@ -51,5 +51,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Nav-n-Defend.sln"
+    "dotnet.defaultSolution": "Nav-n-Defend.sln",
+    "dotnet.preferCSharpExtension": true
 }

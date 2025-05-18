@@ -15,7 +15,7 @@ public class ShopUI : MonoBehaviour
 {   
     [Header("UI References")]
     public TextMeshProUGUI currencyText;
-    
+
     [Header("XR Settings")]
     public TrackedDeviceGraphicRaycaster xrRaycaster;      private void Start()
     {
