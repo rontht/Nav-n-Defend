@@ -3,14 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
-/// <summary>
-/// Handles the shop's currency display UI:
-/// - Updates the coin counter
-/// - Responds to currency changes
-/// - Manages XR raycaster for VR/AR interaction
-/// 
-/// This component should be attached to the shop's main UI canvas.
-/// </summary>
+/// Handles the shop's currency display UI.
 public class ShopUI : MonoBehaviour
 {   
     [Header("UI References")]
