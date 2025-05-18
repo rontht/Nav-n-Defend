@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: -3255102134226530125}
   - component: {fileID: 7476156641751507242}
   m_Layer: 0
-  m_Name: Box
+  m_Name: TreasureChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
