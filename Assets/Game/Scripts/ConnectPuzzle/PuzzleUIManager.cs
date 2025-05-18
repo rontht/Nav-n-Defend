@@ -7,6 +7,7 @@ public class PuzzleUIManager : MonoBehaviour
     [Header("UI Elements")]
     public TMP_Text scoreText;
     public Button backButton;
+    public GameObject scorePanel;
     public Button finishButton;
     public GameObject winPanel;
     public TMP_Text reward;
@@ -20,14 +21,19 @@ public class PuzzleUIManager : MonoBehaviour
     private int maxScore;
     public bool isPuzzleActive = false;
 
+    private int totalCount = 0;
+
     private void Start()
     {
+        if (scoreText == null)
+        {
+            Debug.LogError("Score Text is not assigned in the PuzzleUIManager.");
+        }
         // Initialize the UI
         UpdateScoreText(0);
         backButton.onClick.AddListener(GoBack);
         finishButton.onClick.AddListener(GoBack);
-        scoreText.gameObject.SetActive(false);
-        backButton.gameObject.SetActive(false);
+        scorePanel.SetActive(false);
         winPanel.SetActive(false);
     }
 
@@ -35,45 +41,57 @@ public class PuzzleUIManager : MonoBehaviour
     {
         maxScore = nodePairs;
         currentScore = 0;
+        totalCount = 0;
         UpdateScoreText(0);
-        scoreText.gameObject.SetActive(true);
-        backButton.gameObject.SetActive(true);
+        scorePanel.SetActive(true);
         winPanel.SetActive(false);
         isPuzzleActive = true;
         scanUI.SetActive(false);
     }
 
-    public void UpdateScore()
+    public void UpdateScore(int succcessCount)
     {
         currentScore++;
+        totalCount += succcessCount;
         UpdateScoreText(currentScore);
 
         // Check if the player has completed the puzzle
         if (currentScore >= maxScore)
         {
-            Debug.Log("Puzzle Completed!");
-            scoreText.gameObject.SetActive(false);
-            backButton.gameObject.SetActive(false);
+            int stars = UpdateStarRating();
+            Debug.Log($"You've gained {stars} Stars for completing the puzzle.");
+
+            scorePanel.SetActive(false);
             winPanel.SetActive(true);
+
             reward.text = $"{expReward} experience, {coinReward} coins";
             isPuzzleActive = false;
 
             PlayerStats.Instance.GainExperience(expReward);
             PlayerStats.Instance.AddCoins(coinReward);
-            Debug.Log($"You've gained {expReward} EXP for completing the puzzle.");
         }
+    }
+
+    private int UpdateStarRating()
+    {
+        if (totalCount <= 15)
+            return 3;
+        else if (totalCount >= 16 && totalCount <= 20)
+            return 2;
+        else if (totalCount >= 21)
+            return 1;
+        return 0;
     }
 
     private void UpdateScoreText(int score)
     {
-        scoreText.text = $"Score: {score} / {maxScore}";
+        scoreText.text = $"Score: {score} / {maxScore}. Tile Count: {totalCount}";
     }
 
     private void GoBack()
     {
         // Hide UI when going back
-        scoreText.gameObject.SetActive(false);
-        backButton.gameObject.SetActive(false);
+        scorePanel.SetActive(false);
         winPanel.SetActive(false);
         isPuzzleActive = false;
         scanUI.SetActive(true);

@@ -19,6 +19,7 @@ public class PuzzleManager : MonoBehaviour
     private List<GameObject> nodes;
     private GameObject startingNode;
     private List<Vector2Int> connectingPath = new List<Vector2Int>();
+    private int countForCurrentPath = 0;
 
     private void Awake()
     {
@@ -96,12 +97,12 @@ public class PuzzleManager : MonoBehaviour
                 availablePositions.RemoveAt(randomIndex);
 
                 // calculate the node position (centered within the tile)
-                Vector3 nodePosition = origin + new Vector3(gridPos.x * tileSize - (tileCount - 1) * tileSize / 2, tileSize / 2, gridPos.y * tileSize - (tileCount - 1) * tileSize / 2);
+                Vector3 nodePosition = origin + new Vector3(gridPos.x * tileSize - (tileCount - 1) * tileSize / 2, 0, gridPos.y * tileSize - (tileCount - 1) * tileSize / 2);
                 GameObject node = Instantiate(nodePrefab, nodePosition, Quaternion.identity);
                 node.name = $"Node_{pair}_{n}";
 
                 // scale node to fit within the tile
-                node.transform.localScale = Vector3.one * (tileSize * 0.5f);
+                node.transform.localScale = Vector3.one * (tileSize * 0.9f);
 
                 // set the node color
                 node.GetComponent<Renderer>().material.color = pairColor;
@@ -117,11 +118,18 @@ public class PuzzleManager : MonoBehaviour
             // for mobile AR touch
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
+            {
                 HandleTouch(touch.position);
-            else if (touch.phase == TouchPhase.Moved)
                 UpdateTileHighlight(touch.position);
+            }
+            else if (touch.phase == TouchPhase.Moved)
+            {
+                UpdateTileHighlight(touch.position);
+            }
             else if (touch.phase == TouchPhase.Ended)
+            {
                 ResetTile();
+            }
         }
         else
         {
@@ -182,6 +190,7 @@ public class PuzzleManager : MonoBehaviour
                             lastTile.GetComponent<Renderer>().material.color = Color.white;
 
                         connectingPath.RemoveAt(connectingPath.Count - 1);
+                        countForCurrentPath--;
                         return;
                     }
                 }
@@ -201,6 +210,7 @@ public class PuzzleManager : MonoBehaviour
                     Color highlightColor = startingNode.GetComponent<Renderer>().material.color;
                     tileRenderer.material.color = highlightColor;
                     connectingPath.Add(currentPos);
+                    countForCurrentPath++;
                 }
             }
             // check if current tile contains a node of same color as starting node
@@ -217,7 +227,8 @@ public class PuzzleManager : MonoBehaviour
                     // notify UI
                     PuzzleUIManager uiManager = FindObjectOfType<PuzzleUIManager>();
                     if (uiManager != null)
-                        uiManager.UpdateScore();
+                        uiManager.UpdateScore(countForCurrentPath);
+                        countForCurrentPath = 0;
 
                     // reset the tile effects
                     ResetTile();
