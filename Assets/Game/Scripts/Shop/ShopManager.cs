@@ -4,20 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 
-/// <summary>
-/// Manages the in-game shop system, handling:
-/// - Purchase confirmation flow
-/// - Available items list
-/// - Integration with PlayerStats for purchases
-/// 
-/// This manager coordinates between ShopItemUI components and the PlayerStats
-/// system to process purchases and update the game state.
-/// </summary>
+/// Manages the in-game shop system.
 public class ShopManager : MonoBehaviour
 {
-    /// <summary>
-    /// Singleton instance of the shop manager
-    /// </summary>
+    /// Singleton instance of the shop manager.
     public static ShopManager Instance;
     
     [Header("Shop Items")]
@@ -37,10 +27,7 @@ public class ShopManager : MonoBehaviour
         else
             Destroy(gameObject);
     }    
-    /// <summary>
     /// Displays the purchase confirmation dialog for an item.
-    /// Shows the item name and cost, and stores the item for the confirmation callback.
-    /// </summary>
     /// <param name="item">The shop item the player wants to purchase</param>
     public void ShowPurchaseConfirmation(Shop_Item_Data item)
     {
@@ -63,22 +50,32 @@ public class ShopManager : MonoBehaviour
         purchaseConfirmationDialog.SetActive(false);
         pendingPurchaseItem = null;
     }    
-    /// <summary>
-    /// Attempts to purchase an item by:
-    /// 1. Checking if player can afford it
-    /// 2. Spending the coins
-    /// 3. Applying the item's stat boost
-    /// 4. Marking the item as purchased
-    /// </summary>
+    /// Attempts to purchase an item.
     /// <param name="item">The item to purchase</param>
     /// <returns>True if purchase was successful, false otherwise</returns>
     private bool TryPurchaseItem(Shop_Item_Data item)
     {
         if (PlayerStats.Instance.CanAfford(item.cost))
         {
+            // Check max player owns limit (this is now the only limit)
+            if (item.maxPlayerOwns != -1 && PlayerStats.Instance.GetOwnedItemCount(item.id) >= item.maxPlayerOwns)
+            {
+                Debug.Log($"Cannot purchase {item.itemName}. Max owned limit reached.");
+                return false;
+            }
+
             PlayerStats.Instance.SpendCoins(item.cost);
             PlayerStats.Instance.IncreaseStat(item.type, item.value);
-            PlayerStats.Instance.MarkItemAsPurchased(item.id);
+
+            // Only mark as purchased if it's not a consumable or if it's within limits
+            if (item.type != ItemType.Temp) // Temp items are consumable and not marked as "purchased" in the old sense
+            {
+                 PlayerStats.Instance.MarkItemAsPurchased(item.id);
+            }
+            else // For Temp items, we still need to update their count if they are stackable
+            {
+                 PlayerStats.Instance.MarkItemAsPurchased(item.id); // This will now just increment the count
+            }
             return true;
         }
         return false;

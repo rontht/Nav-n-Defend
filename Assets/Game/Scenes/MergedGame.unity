@@ -1555,7 +1555,8 @@ MonoBehaviour:
   planeManager: {fileID: 1851427688}
   minPlaneWidth: 0.5
   minPlaneHeight: 0.5
-  selectedPlane: {fileID: 0}
+  selectedPlane: {fileID: 7458616195702104732, guid: be15786028b61614e9bfbbaf29710cf5,
+    type: 3}
 --- !u!114 &841877593
 MonoBehaviour:
   m_ObjectHideFlags: 0
