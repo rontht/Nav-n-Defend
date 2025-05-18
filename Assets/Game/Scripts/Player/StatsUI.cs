@@ -5,7 +5,6 @@ using TMPro;
 /// Displays player statistics in the UI:
 /// - Shows current/max HP
 /// - Shows attack power
-/// - Shows defense rating
 /// - Updates automatically when stats change
 /// 
 /// Each stat should have its own UI slot in the inspector array,
@@ -17,7 +16,6 @@ public class StatsUI : MonoBehaviour
     /// Array of UI slots for each stat:
     /// - Index 0: HP display
     /// - Index 1: Attack display
-    /// - Index 2: Defense display
     /// Each slot should have a ValuePanel/Value text hierarchy
     /// </summary>
     public GameObject[] statsSlots;
@@ -45,7 +43,12 @@ public class StatsUI : MonoBehaviour
     {
         UpdateHP();
         UpdateAttack();
-        UpdateDefense();
+        
+        // Adjust array length check if Defense slot is removed
+        if (statsSlots.Length > 2 && statsSlots[2] != null)
+        {
+            statsSlots[2].SetActive(false); // Optionally hide the defense slot
+        }
     }
 
     /// <summary>
@@ -54,9 +57,18 @@ public class StatsUI : MonoBehaviour
     /// </summary>
     public void UpdateHP()
     {
-        Transform valuePanel = statsSlots[0].transform.Find("ValuePanel");
-        TMP_Text valueText = valuePanel.Find("Value").GetComponent<TMP_Text>();
-        valueText.text = PlayerStats.Instance.currentHP + " / " + PlayerStats.Instance.maxHP;
+        if (statsSlots.Length > 0 && statsSlots[0] != null)
+        {
+            Transform valuePanel = statsSlots[0].transform.Find("ValuePanel");
+            if (valuePanel != null)
+            {
+                TMP_Text valueText = valuePanel.Find("Value").GetComponent<TMP_Text>();
+                if (valueText != null && PlayerStats.Instance != null)
+                {
+                    valueText.text = PlayerStats.Instance.currentHP + " / " + PlayerStats.Instance.maxHP;
+                }
+            }
+        }
     }    
     /// <summary>
     /// Updates the Attack stat display.
@@ -64,15 +76,17 @@ public class StatsUI : MonoBehaviour
     /// </summary>
     public void UpdateAttack()
     {
-        Transform valuePanel = statsSlots[1].transform.Find("ValuePanel");
-        TMP_Text valueText = valuePanel.Find("Value").GetComponent<TMP_Text>();
-        valueText.text = "" + PlayerStats.Instance.attack;
-    }
-
-    public void UpdateDefense()
-    {
-        Transform valuePanel = statsSlots[2].transform.Find("ValuePanel");
-        TMP_Text valueText = valuePanel.Find("Value").GetComponent<TMP_Text>();
-        valueText.text = "" + PlayerStats.Instance.defense;
+        if (statsSlots.Length > 1 && statsSlots[1] != null)
+        {
+            Transform valuePanel = statsSlots[1].transform.Find("ValuePanel");
+            if (valuePanel != null)
+            {
+                TMP_Text valueText = valuePanel.Find("Value").GetComponent<TMP_Text>();
+                if (valueText != null && PlayerStats.Instance != null)
+                {
+                    valueText.text = "" + PlayerStats.Instance.attack;
+                }
+            }
+        }
     }
 }

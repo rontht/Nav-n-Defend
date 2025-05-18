@@ -139,7 +139,7 @@ public class ShopItemUI : MonoBehaviour
         }
         else
         {
-            if (costText != null) costText.text = $"Cost: {itemData.cost}";
+            if (costText != null) costText.text = $"{itemData.cost} Coins";
             if (purchaseButton != null && PlayerStats.Instance != null)
                 purchaseButton.interactable = PlayerStats.Instance.CanAfford(itemData.cost);
             else if (purchaseButton != null)
