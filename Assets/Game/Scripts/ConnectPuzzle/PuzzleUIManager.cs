@@ -5,14 +5,16 @@ using UnityEngine.UI;
 public class PuzzleUIManager : MonoBehaviour
 {
     [Header("UI Elements")]
-    public TextMeshProUGUI scoreText;
+    public TMP_Text scoreText;
     public Button backButton;
     public Button finishButton;
     public GameObject winPanel;
+    public TMP_Text reward;
     public GameObject scanUI;
 
     [Header("Game Configs")]
     public int expReward = 3;
+    public int coinReward = 10;
 
     private int currentScore = 0;
     private int maxScore;
@@ -53,9 +55,11 @@ public class PuzzleUIManager : MonoBehaviour
             scoreText.gameObject.SetActive(false);
             backButton.gameObject.SetActive(false);
             winPanel.SetActive(true);
+            reward.text = $"{expReward} experience, {coinReward} coins";
             isPuzzleActive = false;
 
             PlayerStats.Instance.GainExperience(expReward);
+            PlayerStats.Instance.AddCoins(coinReward);
             Debug.Log($"You've gained {expReward} EXP for completing the puzzle.");
         }
     }
