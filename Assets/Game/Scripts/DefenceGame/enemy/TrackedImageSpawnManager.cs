@@ -14,7 +14,6 @@ public class TrackedImageSpawnManager : MonoBehaviour
     private Coroutine spawnRoutine;
     private int spawnCount = 0;
 
-
     void Start()
     {
         remainingSpawns = maxSpawns;
@@ -46,17 +45,26 @@ public class TrackedImageSpawnManager : MonoBehaviour
         int index = UnityEngine.Random.Range(0, spawnPoints.Length);
         Transform spawnPoint = spawnPoints[index];
 
+        // Instantiate the enemy at the spawn point.
         GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
 
+        // Reset the health of the enemy (or other components you want to reset).
+        Health enemyHealth = enemy.GetComponent<Health>();
+        if (enemyHealth != null)
+        {
+            enemyHealth.ResetHealth();  // Ensure health is reset to maxHealth value.
+        }
+
+        // Setup the enemy movement if required.
         EnemyMover mover = enemy.GetComponent<EnemyMover>();
         if (mover != null)
         {
-            mover.SetTarget(transform);
+            mover.SetTarget(transform);  // Ensure movement behavior is set.
         }
 
         UnityEngine.Debug.Log($"Spawns left - {remainingSpawns - 1}");
 
-        //May remove later.
+        // Optionally update remaining spawns count.
         UpdateRemainingSpawns();
     }
 

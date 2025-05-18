@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,30 +6,27 @@ using UnityEngine;
 
 public class Health : MonoBehaviour
 {
-    public int maxHealth = 100;
+    private int maxHealth = 125;
     private int currentHealth;
 
     void Start()
     {
-        currentHealth = maxHealth;
+        ResetHealth();  // Ensure health is reset at the start of the object lifecycle
+    }
+
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;  // Reset health to maxHealth
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
+        UnityEngine.Debug.Log($"Remaining HP - {currentHealth}");
     }
 
-    void Die()
+    public int GetCurrentHealth()
     {
-        UnityEngine.Debug.Log(gameObject.name + " has died.");
-        
-        
-        // TO DO - Add death logic here (e.g., Destroy, animation, etc.)
-        Destroy(gameObject);
+        return currentHealth;
     }
 }

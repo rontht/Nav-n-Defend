@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyMover : MonoBehaviour
@@ -7,14 +6,25 @@ public class EnemyMover : MonoBehaviour
     public Transform target;
     public float speed = 1f;
 
+    private bool canMove = false;
+
     public void SetTarget(Transform newTarget)
     {
         target = newTarget;
+
+        // Delay.
+        StartCoroutine(DelayMovement());
+    }
+
+    private IEnumerator DelayMovement()
+    {
+        yield return new WaitForSeconds(4f);
+        canMove = true;
     }
 
     void Update()
     {
-        if (target == null) return;
+        if (!canMove || target == null) return;
 
         // Relates movement to deltaTime, enables pausing of slime movement.
         float step = speed * Time.deltaTime;

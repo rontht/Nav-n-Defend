@@ -9,6 +9,8 @@ using System;
 public class ImageTrackingToggle : MonoBehaviour
 {
     private int initialSpawns = 0;
+    private int bulletKills = 0;
+
     [Header("AR Tracking")]
     public ARTrackedImageManager imageManager;
 
@@ -17,16 +19,23 @@ public class ImageTrackingToggle : MonoBehaviour
     public GameObject scanMenu;
     public GameObject qrScanMenu;
     public GameObject countdownHold;
+    public GameObject victoryUI;
+    public GameObject gameOverUI;
     public TMP_Text countdownText;
     public TMP_Text remainingSpawnsText;
-    public TMP_Text totalKillsText;  
+    public TMP_Text totalKillsText;
+    public TMP_Text bulletKillsText;
 
-    
     // Utilized for subscribing, required for prefab referencing.
     public TrackedImageSpawnManager spawnManager;
 
     private Coroutine countdownCoroutine;
 
+   /// <summary>
+   /// General UI P1, logic shared for start. When merging games onto same scene, utilize calls here.
+   /// Call your UI and state false, the only one here to be true should be scanMenu.
+   /// </summary>
+    
     void Start()
     {
         if (imageManager != null)
@@ -54,20 +63,34 @@ public class ImageTrackingToggle : MonoBehaviour
             countdownHold.SetActive(false);
         }
 
-        // Subscribe to the enemyHealth.OnKill event to listen for kills.
-        enemyHealth.OnKill += HandleEnemyKill;
+        if (victoryUI != null)
+        {
+            victoryUI.SetActive(false);
+        }
+
+        if (gameOverUI != null)
+        {
+            gameOverUI.SetActive(false);
+        }
+            // Subscribe to the enemyHealth.OnKill event to listen for kills.
+            enemyHealth.OnKill += HandleEnemyKill;
     }
 
+    /// <summary>
+    /// Subscripions to prefabs start here.
+    /// Prefab UI calls found below.
+    /// </summary>
     void OnEnable()
     {
         TrackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
+        CenterTriggerDamage.OnStructureDestroyed += HandleStructureDestroyed;
     }
 
     void OnDisable()
     {
         TrackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
-
-        // Unsubscribe from the OnKill.
+        CenterTriggerDamage.OnStructureDestroyed -= HandleStructureDestroyed;
+        // Unsubscribe
         enemyHealth.OnKill -= HandleEnemyKill;
     }
 
@@ -87,16 +110,46 @@ public class ImageTrackingToggle : MonoBehaviour
     // Method to handle enemy kills and update the UI.
     private void HandleEnemyKill(int kills)
     {
-        // Update the UI to show the total kills
+        // Update the total kills text.
         if (totalKillsText != null)
         {
             totalKillsText.text = "Total Kills: " + kills;
         }
 
+        // Check if the cause of death is "Bullet".
+        if (enemyHealth.lastKillCause == "Bullet")
+        {
+            bulletKills++;  // Increment the bullet kills counter.
+            if (bulletKillsText != null)
+            {
+                bulletKillsText.text = "Bullet Kills: " + bulletKills;
+            }
+        }
+
         UnityEngine.Debug.Log("Total Kills Updated: " + kills);
+        UnityEngine.Debug.Log("Bullet Kills Updated: " + bulletKills);
+
+        if (kills == initialSpawns)
+        {
+            if (victoryUI != null)
+            {
+                victoryUI.SetActive(true);  // VICTORY AT LAST AAAAAAAAAAAAAAAAH.
+                generalUI.SetActive(false);
+            }
+        }
     }
 
-    void Update()
+    private void HandleStructureDestroyed()
+    {
+        UnityEngine.Debug.Log("Structure destroyed triggering Game Over UI.");
+        if (gameOverUI != null)
+            gameOverUI.SetActive(true);
+
+        if (generalUI != null)
+            generalUI.SetActive(false);
+    }
+
+        void Update()
     {
         if (spawnManager != null)
         {
@@ -112,6 +165,13 @@ public class ImageTrackingToggle : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Prefab UI calls end here.
+    /// </summary>
+
+    /// <summary>
+    /// General UI P2, Switch to proper QR Scan.
+    /// </summary>
     public void OnSurfaceFoundPressed()
     {
         if (imageManager != null)
@@ -135,6 +195,10 @@ public class ImageTrackingToggle : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Switch for what game UI should show goes here.
+    /// Sort out later, if time allows.
+    /// </summary>
     public void OnScanButtonPressed()
     {
         if (imageManager != null)

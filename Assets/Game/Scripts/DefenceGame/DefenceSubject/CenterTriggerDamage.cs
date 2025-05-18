@@ -1,14 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CenterTriggerDamage : MonoBehaviour
 {
-    public int structureDamageAmount = 10;  
-    private Health structureHealth;         
+    private int structureDamageAmount = 25;  
+    private Health structureHealth;
+
+    public static event Action OnStructureDestroyed;
 
     void Start()
     {
+        gameObject.SetActive(true);
         structureHealth = GetComponent<Health>();
     }
 
@@ -21,16 +25,28 @@ public class CenterTriggerDamage : MonoBehaviour
         {
             enemyHealth health = root.GetComponent<enemyHealth>();
 
-            //Damage equal to slimes maximum health.
+            // Damage equal to slimes maximum health.
             if (health != null)
             {
-                health.TakeDamage(health.maxHealth);  
+                health.TakeDamage(health.maxHealth, "CenterTrigger");  
             }
 
-            //Structure takes 10 damage.
+            //Structure structureDamageAmount value.
             if (structureHealth != null)
             {
                 structureHealth.TakeDamage(structureDamageAmount);
+                //UnityEngine.Debug.Log($"Remaining HP - {Health}");
+            }
+
+            if (structureHealth.GetCurrentHealth() <= 0)
+            {
+
+                if (OnStructureDestroyed != null)
+                {
+                    OnStructureDestroyed();
+                }
+
+                gameObject.SetActive(false);
             }
         }
     }
