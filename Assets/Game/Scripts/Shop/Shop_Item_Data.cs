@@ -3,7 +3,6 @@ using UnityEngine;
 /// <summary>
 /// Types of stats that shop items can modify:
 /// - maxHP: Increases maximum health capacity
-/// - defense: Increases damage reduction
 /// - attack: Increases damage dealing capability
 /// </summary>
 public enum ItemType
@@ -11,9 +10,6 @@ public enum ItemType
     /// <summary> 
     /// /// Maximum health capacity</summary>
     maxHP,
-    /// <summary>Damage 
-    /// reduction</summary>
-    defense,
     /// <summary>Damage 
     /// dealing capability</summary>
     attack
@@ -32,7 +28,7 @@ public enum ItemType
 
 /// <summary>
 /// Scriptable Object that defines a purchasable item in the shop.
-/// Each item can modify one type of player stat (HP, Attack, or Defense).
+/// Each item can modify one type of player stat (HP or Attack).
 /// Items maintain their purchase state through the PlayerStats system.
 /// Create new items through Unity menu: Assets > Create > Shop > Item Data
 /// </summary>
@@ -48,8 +44,9 @@ public class Shop_Item_Data : ScriptableObject
     [Header("Shop Settings")]
     public int cost;
     public Sprite icon;
-      [Header("Stat Modification")]
-    public ItemType type;
+
+    [Header("Stat Modification")]
+    public ItemType type; // Now only maxHP or attack
     public int value;
 
     /// <summary>
@@ -58,7 +55,7 @@ public class Shop_Item_Data : ScriptableObject
     /// </summary>
     public bool isPurchased => PlayerStats.Instance != null && PlayerStats.Instance.HasPurchasedItem(id);
 
-      /// <summary>
+    /// <summary>
     /// Unity callback that runs in the editor when this asset is modified.
     /// Automatically generates a unique ID for new items.
     /// This ensures that items can be properly tracked in the save system.

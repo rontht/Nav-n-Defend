@@ -5,7 +5,7 @@ using System;
 
 /// <summary>
 /// Core player statistics manager that handles:
-/// - Player's core stats (HP, Attack, Defense)
+/// - Player's core stats (HP, Attack)
 /// - Currency system (coins)
 /// - Purchased items tracking
 /// - Stat persistence between sessions
@@ -24,9 +24,8 @@ public class PlayerStats : MonoBehaviour
     public static PlayerStats Instance { get; private set; }
 
     [Header("Base Stats")]
-    [SerializeField] private int baseMaxHP = 100;
-    [SerializeField] private int baseAttack = 10;
-    [SerializeField] private int baseDefense = 5;
+    [SerializeField] private int baseMaxHP = 100; // Represents current base HP, initialized to L1 default
+    [SerializeField] private int baseAttack = 10;   // Represents current base Attack, initialized to L1 default
     [SerializeField] private int startingCoins = 50;
     [SerializeField] private int startingLevel = 1;
     [SerializeField] private int startingExp = 0;
@@ -37,7 +36,6 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int _maxHP;
     [SerializeField] private int _currentHP;
     [SerializeField] private int _attack;
-    [SerializeField] private int _defense;
     [SerializeField] private int _coins;
     [SerializeField] private int _level;
     [SerializeField] private int _currentExp;
@@ -48,7 +46,6 @@ public class PlayerStats : MonoBehaviour
     public int maxHP => _maxHP;
     public int currentHP => _currentHP;
     public int attack => _attack;
-    public int defense => _defense;
     public int coins => _coins;
     public int currentExp => _currentExp;
     public int expToLevelUp => _expToLevelUp;
@@ -62,11 +59,12 @@ public class PlayerStats : MonoBehaviour
     private const string MAX_HP_KEY = "PlayerMaxHP";
     private const string CURRENT_HP_KEY = "PlayerCurrentHP";
     private const string ATK_KEY = "PlayerAttack";
-    private const string DEF_KEY = "PlayerDefense";
     private const string PURCHASED_ITEMS_KEY = "PurchasedItems";
     private const string LEVEL_KEY = "PlayerLevel";
     private const string EXP_KEY = "PlayerExp";
     private const string EXP_TO_LEVEL_KEY = "PlayerExpToLevelUp";
+    private const string BASE_MAX_HP_KEY = "PlayerLeveledBaseMaxHP"; // New Key
+    private const string BASE_ATTACK_KEY = "PlayerLeveledBaseAttack"; // New Key
 
     // Events for UI updates
     public event Action onCoinsChanged;
@@ -138,7 +136,7 @@ public class PlayerStats : MonoBehaviour
     /// Increases a specific stat by the given amount and updates the player state
     /// For HP increases, maintains the same health percentage after the increase
     /// </summary>
-    /// <param name="statType">The type of stat to increase (HP, Attack, or Defense)</param>
+    /// <param name="statType">The type of stat to increase (HP, Attack)</param>
     /// <param name="amount">The amount to increase the stat by</param>
     public void IncreaseStat(ItemType statType, int amount)
     {
@@ -155,10 +153,6 @@ public class PlayerStats : MonoBehaviour
             case ItemType.attack:
                 _attack += amount;
                 Debug.Log($"Attack increased by {amount}. New Attack: {_attack}");
-                break;
-            case ItemType.defense:
-                _defense += amount;
-                Debug.Log($"Defense increased by {amount}. New Defense: {_defense}");
                 break;
         }
         SaveStats();
@@ -180,29 +174,39 @@ public class PlayerStats : MonoBehaviour
         PlayerPrefs.SetInt(MAX_HP_KEY, _maxHP);
         PlayerPrefs.SetInt(CURRENT_HP_KEY, _currentHP);
         PlayerPrefs.SetInt(ATK_KEY, _attack);
-        PlayerPrefs.SetInt(DEF_KEY, _defense);
         PlayerPrefs.SetInt(LEVEL_KEY, _level);
         PlayerPrefs.SetInt(EXP_KEY, _currentExp);
         PlayerPrefs.SetInt(EXP_TO_LEVEL_KEY, _expToLevelUp);
+
+        // Save current (potentially leveled-up) base stats
+        PlayerPrefs.SetInt(BASE_MAX_HP_KEY, baseMaxHP);
+        PlayerPrefs.SetInt(BASE_ATTACK_KEY, baseAttack);
 
         string purchasedItemsString = string.Join(",", purchasedItemIDs);
         PlayerPrefs.SetString(PURCHASED_ITEMS_KEY, purchasedItemsString);
 
         PlayerPrefs.Save();
-        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, DEF: {_defense}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}");
+        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}");
     }
 
     public void LoadStats()
     {
-        // Load with default values if keys don't exist
+        // Load core progression stats first
         _coins = PlayerPrefs.GetInt(COINS_KEY, startingCoins);
-        _maxHP = PlayerPrefs.GetInt(MAX_HP_KEY, baseMaxHP);
-        _currentHP = PlayerPrefs.GetInt(CURRENT_HP_KEY, _maxHP);
-        _attack = PlayerPrefs.GetInt(ATK_KEY, baseAttack);
-        _defense = PlayerPrefs.GetInt(DEF_KEY, baseDefense);
         _level = PlayerPrefs.GetInt(LEVEL_KEY, startingLevel);
         _currentExp = PlayerPrefs.GetInt(EXP_KEY, startingExp);
         _expToLevelUp = PlayerPrefs.GetInt(EXP_TO_LEVEL_KEY, startingExpToLevelUp);
+
+        // Load current base stats. If keys don't exist, 'baseMaxHP' (etc.) will retain its Inspector-defined L1 default value.
+        baseMaxHP = PlayerPrefs.GetInt(BASE_MAX_HP_KEY, baseMaxHP);
+        baseAttack = PlayerPrefs.GetInt(BASE_ATTACK_KEY, baseAttack);
+
+        // Load total stats, defaulting to the now loaded/initialized base stats.
+        // This ensures that if total stats aren't saved, they start equal to current base stats.
+        _maxHP = PlayerPrefs.GetInt(MAX_HP_KEY, baseMaxHP);
+        _attack = PlayerPrefs.GetInt(ATK_KEY, baseAttack);
+        _currentHP = PlayerPrefs.GetInt(CURRENT_HP_KEY, _maxHP); // Default current HP to loaded max HP
+
 
         string purchasedItemsString = PlayerPrefs.GetString(PURCHASED_ITEMS_KEY, "");
         if (!string.IsNullOrEmpty(purchasedItemsString))
@@ -223,15 +227,22 @@ public class PlayerStats : MonoBehaviour
 
     public void ResetStats()
     {
-        _maxHP = baseMaxHP;
-        _currentHP = baseMaxHP;
-        _attack = baseAttack;
-        _defense = baseDefense;
-        _coins = startingCoins;
+        // Reset to initial L1 values defined by startingX fields or hardcoded L1 defaults
         _level = startingLevel;
+        _coins = startingCoins;
         _currentExp = startingExp;
         _expToLevelUp = startingExpToLevelUp;
-        // purchasedItemIDs.Clear(); // Remove all purchased items
+
+        // Reset base stats to their absolute L1 defaults
+        baseMaxHP = 100; 
+        baseAttack = 10;    
+
+        // Total stats become the L1 base stats
+        _maxHP = baseMaxHP;
+        _currentHP = baseMaxHP; // Full health at L1
+        _attack = baseAttack;
+        
+        purchasedItemIDs.Clear(); // Clear all purchased items on reset
 
         SaveStats(); // Save the reset stats to PlayerPrefs
         onCoinsChanged?.Invoke();
@@ -251,7 +262,6 @@ public class PlayerStats : MonoBehaviour
         // Reset stats to base values
         _maxHP = baseMaxHP;
         _attack = baseAttack;
-        _defense = baseDefense;
 
         // Store current health percentage for proportional adjustment
         float healthPercentage = _currentHP / (float)_maxHP;
@@ -269,9 +279,6 @@ public class PlayerStats : MonoBehaviour
                     case ItemType.attack:
                         _attack += item.value;
                         break;
-                    case ItemType.defense:
-                        _defense += item.value;
-                        break;
                 }
             }
         }
@@ -280,7 +287,7 @@ public class PlayerStats : MonoBehaviour
         _currentHP = Mathf.RoundToInt(_maxHP * healthPercentage);
         _currentHP = Mathf.Clamp(_currentHP, 1, _maxHP); // Ensure at least 1 HP
 
-        Debug.Log($"Stats recalculated. HP: {_currentHP}/{_maxHP}, ATK: {_attack}, DEF: {_defense}");
+        Debug.Log($"Stats recalculated. HP: {_currentHP}/{_maxHP}, ATK: {_attack}");
         SaveStats();
         onStatsChanged?.Invoke();
     }
@@ -350,9 +357,42 @@ public class PlayerStats : MonoBehaviour
         // level up and remove exp
         _currentExp -= _expToLevelUp;
         _level++;
-        Debug.Log($"Leveled up! New Level: {_level}, EXP to next level: {_expToLevelUp}");
 
-        // reset the exp to 0
+        // Store old base values for delta calculation
+        int oldLeveledBaseMaxHP = baseMaxHP;
+        int oldLeveledBaseAttack = baseAttack;
+
+        // Increase current base stats by 20% and round up
+        baseMaxHP = Mathf.CeilToInt(baseMaxHP * 1.20f);
+        baseAttack = Mathf.CeilToInt(baseAttack * 1.20f);
+
+        // Calculate the actual change (delta) in base stats
+        int deltaBaseHP = baseMaxHP - oldLeveledBaseMaxHP;
+        int deltaBaseAttack = baseAttack - oldLeveledBaseAttack;
+
+        // Store old total MaxHP for health percentage calculation
+        float oldTotalMaxHP = _maxHP;
+
+        // Update total stats by adding the delta from base stat increase
+        _maxHP += deltaBaseHP;
+        _attack += deltaBaseAttack;
+
+        // Adjust _currentHP proportionally to maintain health percentage
+        if (oldTotalMaxHP > 0)
+        {
+            _currentHP = Mathf.RoundToInt(((float)_currentHP / oldTotalMaxHP) * _maxHP);
+        }
+        else
+        {
+            // If old max HP was 0 or less (e.g., just revived or error state), set current HP to new max HP
+            _currentHP = _maxHP;
+        }
+        _currentHP = Mathf.Min(_currentHP, _maxHP); // Clamp current HP to not exceed new max HP
+        _currentHP = Mathf.Max(0, _currentHP);     // Ensure current HP is not negative
+
+        Debug.Log($"Leveled up! New Level: {_level}. New Base HP: {baseMaxHP}, New Base ATK: {baseAttack}. Total MaxHP: {_maxHP}, Total ATK: {_attack}. CurrentHP: {_currentHP}");
+        
+        // reset the exp to 0 if max level is reached
         if (_level >= maxLevel)
         {
             _currentExp = 0;

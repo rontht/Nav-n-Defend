@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a1d13a0f477267c4caafe0c03505ba99, type: 3}
-  m_Name: 1
+  m_Name: Slot 9
   m_EditorClassIdentifier: 
-  id: 03cca5ef-2b24-4ce1-ae3e-175ca36a3e55
+  id: 660305f1-78f5-4029-be4a-edd63118644e
   itemName: 
   description: 
-  cost: 100
-  icon: {fileID: 21300000, guid: 5b1107c6d2a0f904b8033227f55861b2, type: 3}
-  type: 0
-  value: 5
-  isPurchased: 0
+  cost: 50
+  icon: {fileID: 21300000, guid: 6a4eafec8b4d0c2438bceecd7ea71c91, type: 3}
+  type: 2
+  value: 10
