@@ -228,7 +228,7 @@ GameObject:
   - component: {fileID: 2711128787619168229}
   - component: {fileID: 1104428547209235446}
   m_Layer: 0
-  m_Name: DefenceSubjectHitBox
+  m_Name: DefenceMarker
   m_TagString: Defend
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
