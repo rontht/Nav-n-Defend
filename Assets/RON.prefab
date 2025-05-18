@@ -59,7 +59,7 @@ GameObject:
   - component: {fileID: 8625654617629504571}
   - component: {fileID: 5376619477706881164}
   m_Layer: 31
-  m_Name: PuzzleMarker
+  m_Name: TreasureChest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -933,7 +933,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e7caa4d21e057c1479822ec1b90c77f5, type: 2}
+  - {fileID: 2100000, guid: 40d9ddbae3d7ca24096f7e2984c8eaca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

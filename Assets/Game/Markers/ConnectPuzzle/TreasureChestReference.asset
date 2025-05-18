@@ -10,30 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
-  m_Name: ReferenceImageLibrary
+  m_Name: TreasureChestReference
   m_EditorClassIdentifier: 
-  m_GuidLow: 5035937985347112670
-  m_GuidHigh: 8579190415972551337
+  m_GuidLow: 5111960708859523069
+  m_GuidHigh: 14735436435826688142
   m_DataStore:
     m_Storage: []
   m_Images:
   - m_SerializedGuid:
-      m_GuidLow: 5297163887775197880
-      m_GuidHigh: 9802601337889890196
+      m_GuidLow: 5463519979065286833
+      m_GuidHigh: 11124601209688549032
     m_SerializedTextureGuid:
       m_GuidLow: 8436542752763287596
       m_GuidHigh: 1101958774674383464
-    m_Size: {x: 300, y: 300}
-    m_SpecifySize: 1
-    m_Name: PuzzleMarker
-    m_Texture: {fileID: 0}
-  - m_SerializedGuid:
-      m_GuidLow: 5485379709440125831
-      m_GuidHigh: 17667170449613096078
-    m_SerializedTextureGuid:
-      m_GuidLow: 4504773949055300363
-      m_GuidHigh: 5204119766879134760
-    m_Size: {x: 300, y: 300}
-    m_SpecifySize: 1
-    m_Name: DefenseMarker
+    m_Size: {x: 0, y: 0}
+    m_SpecifySize: 0
+    m_Name: TreasureChest
     m_Texture: {fileID: 0}

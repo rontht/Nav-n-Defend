@@ -71,7 +71,7 @@ public class PuzzleManager : MonoBehaviour
                 Vector3 position = origin + new Vector3(i * tileSize - (tileCount - 1) * tileSize / 2, 0, j * tileSize - (tileCount - 1) * tileSize / 2);
                 GameObject gridPiece = Instantiate(gridPrefab, position, Quaternion.identity);
                 gridPiece.name = $"Grid_{i}_{j}";
-                gridPiece.transform.localScale = new Vector3(tileSize, 0.1f, tileSize);
+                gridPiece.transform.localScale = new Vector3(tileSize, 0.01f, tileSize);
                 gridPieces[i, j] = gridPiece;
             }
     }
