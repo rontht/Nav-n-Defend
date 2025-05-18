@@ -5,9 +5,11 @@ public enum ItemType
 {
     /// Maximum health capacity
     HP,
-    ///Damage 
-    /// dealing capability
-    attack
+  
+    ///Damage dealing capability
+    attack,
+    /// Temporary effects, e.g., healing potions
+    Temp
 }
 
 /// ScriptableObject that defines a purchasable shop item.
@@ -23,6 +25,7 @@ public class Shop_Item_Data : ScriptableObject
     [Header("Shop Settings")]
     public int cost;
     public Sprite icon;
+    public int maxPlayerOwns = -1; // -1 for infinite, now the sole limit
 
     [Header("Stat Modification")]
     public ItemType type; // Now only HP or attack
