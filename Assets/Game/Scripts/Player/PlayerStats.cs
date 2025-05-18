@@ -41,6 +41,8 @@ public class PlayerStats : MonoBehaviour
 
     // List to store the IDs of purchased items
     private List<string> purchasedItemIDs = new List<string>();
+    // Dictionary to store the count of owned items
+    private Dictionary<string, int> ownedItemCounts = new Dictionary<string, int>();
 
     // Constants for PlayerPrefs Keys
     private const string COINS_KEY = "PlayerCoins";
@@ -48,6 +50,7 @@ public class PlayerStats : MonoBehaviour
     private const string CURRENT_HP_KEY = "PlayerCurrentHP";
     private const string ATK_KEY = "PlayerAttack";
     private const string PURCHASED_ITEMS_KEY = "PurchasedItems";
+    private const string OWNED_ITEM_COUNTS_KEY = "OwnedItemCounts"; // New key for owned item counts
     private const string LEVEL_KEY = "PlayerLevel";
     private const string EXP_KEY = "PlayerExp";
     private const string EXP_TO_LEVEL_KEY = "PlayerExpToLevelUp";
@@ -132,6 +135,10 @@ public class PlayerStats : MonoBehaviour
                 _attack += amount;
                 Debug.Log($"Attack increased by {amount}. New Attack: {_attack}");
                 break;
+            case ItemType.Temp: // Added case for Temp items
+                Heal(amount);
+                Debug.Log($"Player healed by {amount}. CurrentHP: {_currentHP}");
+                break;
         }
         SaveStats();
         onStatsChanged?.Invoke();
@@ -159,6 +166,10 @@ public class PlayerStats : MonoBehaviour
 
         string purchasedItemsString = string.Join(",", purchasedItemIDs);
         PlayerPrefs.SetString(PURCHASED_ITEMS_KEY, purchasedItemsString);
+
+        // Save owned item counts
+        string ownedItemCountsString = string.Join(";", ownedItemCounts.Select(kv => kv.Key + ":" + kv.Value));
+        PlayerPrefs.SetString(OWNED_ITEM_COUNTS_KEY, ownedItemCountsString);
 
         PlayerPrefs.Save();
         Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}");
@@ -192,6 +203,21 @@ public class PlayerStats : MonoBehaviour
             purchasedItemIDs = new List<string>();
         }
 
+        // Load owned item counts
+        string ownedItemCountsString = PlayerPrefs.GetString(OWNED_ITEM_COUNTS_KEY, "");
+        ownedItemCounts = new Dictionary<string, int>();
+        if (!string.IsNullOrEmpty(ownedItemCountsString))
+        {
+            foreach (string pair in ownedItemCountsString.Split(';'))
+            {
+                string[] keyValue = pair.Split(':');
+                if (keyValue.Length == 2)
+                {
+                    ownedItemCounts[keyValue[0]] = int.Parse(keyValue[1]);
+                }
+            }
+        }
+
         // Debug.Log("Player stats and purchased items loaded.");
 
         // Notify UI of loaded stats
@@ -217,6 +243,7 @@ public class PlayerStats : MonoBehaviour
         _attack = baseAttack;
         
         purchasedItemIDs.Clear(); // Clear all purchased items
+        ownedItemCounts.Clear(); // Clear all owned item counts
 
         SaveStats(); // Save the reset stats
         onCoinsChanged?.Invoke();
@@ -249,6 +276,9 @@ public class PlayerStats : MonoBehaviour
                     case ItemType.attack:
                         _attack += item.value;
                         break;
+                    // Temp items are not recalculated as they are consumables
+                    case ItemType.Temp: 
+                        break;
                 }
             }
         }
@@ -273,9 +303,25 @@ public class PlayerStats : MonoBehaviour
         {
             purchasedItemIDs.Add(itemId);
             Debug.Log($"Item {itemId} marked as purchased.");
-            SaveStats();
-            onStatsChanged?.Invoke();
+            // SaveStats(); // SaveStats is called in IncreaseStat or after spending coins
+            // onStatsChanged?.Invoke();
         }
+        // Increment owned item count
+        if (ownedItemCounts.ContainsKey(itemId))
+        {
+            ownedItemCounts[itemId]++;
+        }
+        else
+        {
+            ownedItemCounts[itemId] = 1;
+        }
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    public int GetOwnedItemCount(string itemId)
+    {
+        return ownedItemCounts.TryGetValue(itemId, out int count) ? count : 0;
     }
 
     private void SavePurchasedItems()
@@ -291,9 +337,22 @@ public class PlayerStats : MonoBehaviour
         purchasedItemIDs = string.IsNullOrEmpty(purchasedItemsStr)
             ? new List<string>()
             : purchasedItemsStr.Split(',').ToList();
+
+        // Also load owned item counts here if not done in LoadStats
+        string ownedItemCountsString = PlayerPrefs.GetString(OWNED_ITEM_COUNTS_KEY, "");
+        ownedItemCounts = new Dictionary<string, int>();
+        if (!string.IsNullOrEmpty(ownedItemCountsString))
+        {
+            foreach (string pair in ownedItemCountsString.Split(';'))
+            {
+                string[] keyValue = pair.Split(':');
+                if (keyValue.Length == 2)
+                {
+                    ownedItemCounts[keyValue[0]] = int.Parse(keyValue[1]);
+                }
+            }
+        }
     }
-
-
 
 
 
