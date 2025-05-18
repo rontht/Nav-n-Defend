@@ -401,7 +401,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseMaxHP: 100
   baseAttack: 10
-  baseDefense: 5
   startingCoins: 50
   startingLevel: 1
   startingExp: 0
@@ -410,7 +409,6 @@ MonoBehaviour:
   _maxHP: 0
   _currentHP: 0
   _attack: 0
-  _defense: 0
   _coins: 0
   _level: 0
   _currentExp: 0
@@ -1435,7 +1433,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 6
+          m_IntArgument: 7
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0

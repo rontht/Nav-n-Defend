@@ -349,6 +349,7 @@ MonoBehaviour:
     type: 3}
   spawnInterval: 5
   maxSpawns: 9
+  remainingSpawns: 0
 --- !u!65 &2858982618141376062
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -382,7 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a4ac9dbc5337d240bf1b8d827b26a86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damageAmount: 10
+  structureDamageAmount: 10
 --- !u!114 &2711128787619168229
 MonoBehaviour:
   m_ObjectHideFlags: 0

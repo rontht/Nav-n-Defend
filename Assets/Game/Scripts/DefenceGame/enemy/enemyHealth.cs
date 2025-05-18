@@ -25,9 +25,7 @@ public class enemyHealth : MonoBehaviour
 
     private void Die()
     {
-        //UnityEngine.Debug.Log($"{gameObject.name} has died.");
-
-        //Good for now. Look into death animation.
         Destroy(gameObject); 
+
     }
 }

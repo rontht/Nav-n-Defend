@@ -4,22 +4,36 @@ using UnityEngine;
 
 public class CenterTriggerDamage : MonoBehaviour
 {
-    public int damageAmount = 10;
+    public int structureDamageAmount = 10;  
+    private Health structureHealth;         
+
+    void Start()
+    {
+        structureHealth = GetComponent<Health>();
+    }
 
     void OnTriggerEnter(Collider other)
     {
         GameObject root = other.transform.root.gameObject;
 
+        // Check if the object that triggered the event is an enemy.
         if (root.CompareTag("Enemy"))
         {
-            Health health = GetComponent<Health>();
+            enemyHealth health = root.GetComponent<enemyHealth>();
+
+            //Damage equal to slimes maximum health.
             if (health != null)
             {
-                health.TakeDamage(damageAmount);
+                health.TakeDamage(health.maxHealth);  
             }
 
-            Destroy(root); // Removes entity that had contact.
+            //Structure takes 10 damage.
+            if (structureHealth != null)
+            {
+                structureHealth.TakeDamage(structureDamageAmount);
+            }
         }
     }
 }
+
 

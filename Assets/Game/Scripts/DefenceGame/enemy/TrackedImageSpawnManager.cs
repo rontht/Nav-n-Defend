@@ -8,21 +8,22 @@ public class TrackedImageSpawnManager : MonoBehaviour
     public GameObject enemyPrefab;
     public float spawnInterval = 5f;
     public int maxSpawns = 9;
+    public int remainingSpawns;
+    public static event Action<TrackedImageSpawnManager> OnSpawnManagerReady;
 
     private Coroutine spawnRoutine;
     private int spawnCount = 0;
+    
 
     void Start()
     {
+        remainingSpawns = maxSpawns;
         if (spawnPoints.Length > 0 && enemyPrefab != null)
         {
             spawnRoutine = StartCoroutine(SpawnRoutine());
             UnityEngine.Debug.Log("Started enemy spawning.");
         }
-        else
-        {
-            //UnityEngine.Debug.LogWarning("Spawn points or enemy prefab not assigned.");
-        }
+        OnSpawnManagerReady?.Invoke(this);
     }
 
     private IEnumerator SpawnRoutine()
@@ -33,6 +34,7 @@ public class TrackedImageSpawnManager : MonoBehaviour
         {
             SpawnEnemy();
             spawnCount++;
+            remainingSpawns--;
             yield return new WaitForSeconds(spawnInterval);
         }
 
@@ -49,9 +51,22 @@ public class TrackedImageSpawnManager : MonoBehaviour
         EnemyMover mover = enemy.GetComponent<EnemyMover>();
         if (mover != null)
         {
-            mover.SetTarget(transform); 
+            mover.SetTarget(transform);
         }
 
-        //UnityEngine.Debug.Log($"Spawned enemy {spawnCount + 1} at {spawnPoint.name}");
+        UnityEngine.Debug.Log($"Spawns left - {remainingSpawns - 1}");
+
+        // This method could be called if you want to notify when a spawn happens, but
+        // it's already reflected in the remainingSpawns variable.
+        UpdateRemainingSpawns();
+    }
+
+    // Optionally add a method to notify others of spawn count changes
+    public void UpdateRemainingSpawns()
+    {
+        if (remainingSpawns <= 0)
+        {
+            UnityEngine.Debug.Log("No more spawns left.");
+        }
     }
 }

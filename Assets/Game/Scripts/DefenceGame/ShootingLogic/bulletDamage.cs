@@ -18,7 +18,5 @@ public class bulletDamage : MonoBehaviour
                 health.TakeDamage(damageAmount);
             }
         }
-
-        Destroy(gameObject);
     }
 }

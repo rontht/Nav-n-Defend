@@ -4,6 +4,8 @@ using UnityEngine.XR.ARFoundation;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System.Diagnostics;
+using System;
 
 public class ImageTrackingToggle : MonoBehaviour
 {
@@ -16,11 +18,12 @@ public class ImageTrackingToggle : MonoBehaviour
     public GameObject qrScanMenu;
     public GameObject countdownHold;
     public TMP_Text countdownText;
+    public TMP_Text remainingSpawnsText;
+
+    public TrackedImageSpawnManager spawnManager;
 
     private Coroutine countdownCoroutine;
 
-    // Menu States upon Scene Load for layered safety.
-    /// If I have time, look into dictionary handling.
     void Start()
     {
         if (imageManager != null)
@@ -47,9 +50,43 @@ public class ImageTrackingToggle : MonoBehaviour
         {
             countdownHold.SetActive(false);
         }
+
+        // Donft try to access spawnManager here if it doesnft exist yet!
     }
 
-    // Called when the Surface Found button is pressed.
+    // 
+    void OnEnable()
+    {
+        TrackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
+    }
+
+    void OnDisable()
+    {
+        TrackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
+    }
+
+    private void HandleSpawnManagerReady(TrackedImageSpawnManager manager)
+    {
+        spawnManager = manager;
+        UpdateRemainingSpawnsText();
+    }
+
+    void Update()
+    {
+        if (spawnManager != null)
+        {
+            UpdateRemainingSpawnsText();
+        }
+    }
+
+    public void UpdateRemainingSpawnsText()
+    {
+        if (remainingSpawnsText != null && spawnManager != null)
+        {
+            remainingSpawnsText.text = "Remaining Spawns: " + spawnManager.remainingSpawns;
+        }
+    }
+
     public void OnSurfaceFoundPressed()
     {
         if (imageManager != null)
@@ -73,7 +110,6 @@ public class ImageTrackingToggle : MonoBehaviour
         }
     }
 
-    // Called when the Scan button is pressed.
     public void OnScanButtonPressed()
     {
         if (imageManager != null)
@@ -100,7 +136,6 @@ public class ImageTrackingToggle : MonoBehaviour
     {
         int current = seconds;
 
-        // Countdown
         while (current > 0)
         {
             if (countdownText != null)
@@ -111,9 +146,8 @@ public class ImageTrackingToggle : MonoBehaviour
             current--;
         }
 
-        yield return new WaitForSeconds(0.5f); // Pause before showing next UI and hiding self.
+        yield return new WaitForSeconds(0.5f);
 
-        // Hide the countdown UI after the countdown.
         if (countdownHold != null)
         {
             countdownHold.SetActive(false);
@@ -124,6 +158,6 @@ public class ImageTrackingToggle : MonoBehaviour
             generalUI.SetActive(true);
         }
 
-        countdownCoroutine = null; // Related to timer reset.
+        countdownCoroutine = null;
     }
 }
