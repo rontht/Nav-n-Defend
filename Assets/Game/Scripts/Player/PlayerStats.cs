@@ -120,7 +120,7 @@ public class PlayerStats : MonoBehaviour
     {
         switch (statType)
         {
-            case ItemType.maxHP:
+            case ItemType.HP:
                 _maxHP += amount;
                 // Also increase current HP proportionally when max HP increases
                 float healthPercentage = _currentHP / (float)_maxHP;
@@ -243,7 +243,7 @@ public class PlayerStats : MonoBehaviour
             {
                 switch (item.type)
                 {
-                    case ItemType.maxHP:
+                    case ItemType.HP:
                         _maxHP += item.value;
                         break;
                     case ItemType.attack:
