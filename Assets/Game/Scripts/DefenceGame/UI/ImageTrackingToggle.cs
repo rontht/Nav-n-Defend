@@ -4,11 +4,11 @@ using UnityEngine.XR.ARFoundation;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using System.Diagnostics;
 using System;
 
 public class ImageTrackingToggle : MonoBehaviour
 {
+    private int initialSpawns = 0;
     [Header("AR Tracking")]
     public ARTrackedImageManager imageManager;
 
@@ -19,7 +19,10 @@ public class ImageTrackingToggle : MonoBehaviour
     public GameObject countdownHold;
     public TMP_Text countdownText;
     public TMP_Text remainingSpawnsText;
+    public TMP_Text totalKillsText;  
 
+    
+    // Utilized for subscribing, required for prefab referencing.
     public TrackedImageSpawnManager spawnManager;
 
     private Coroutine countdownCoroutine;
@@ -51,10 +54,10 @@ public class ImageTrackingToggle : MonoBehaviour
             countdownHold.SetActive(false);
         }
 
-        // DonÅft try to access spawnManager here if it doesnÅft exist yet!
+        // Subscribe to the enemyHealth.OnKill event to listen for kills.
+        enemyHealth.OnKill += HandleEnemyKill;
     }
 
-    // 
     void OnEnable()
     {
         TrackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
@@ -63,12 +66,34 @@ public class ImageTrackingToggle : MonoBehaviour
     void OnDisable()
     {
         TrackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
+
+        // Unsubscribe from the OnKill.
+        enemyHealth.OnKill -= HandleEnemyKill;
     }
 
     private void HandleSpawnManagerReady(TrackedImageSpawnManager manager)
     {
         spawnManager = manager;
+
+        if (spawnManager != null)
+        {
+            initialSpawns = spawnManager.remainingSpawns;
+            UnityEngine.Debug.Log("Initial Spawns Set To: " + initialSpawns);
+        }
+
         UpdateRemainingSpawnsText();
+    }
+
+    // Method to handle enemy kills and update the UI.
+    private void HandleEnemyKill(int kills)
+    {
+        // Update the UI to show the total kills
+        if (totalKillsText != null)
+        {
+            totalKillsText.text = "Total Kills: " + kills;
+        }
+
+        UnityEngine.Debug.Log("Total Kills Updated: " + kills);
     }
 
     void Update()
@@ -129,6 +154,7 @@ public class ImageTrackingToggle : MonoBehaviour
                 countdownHold.SetActive(true);
             }
             countdownCoroutine = StartCoroutine(StartCountdown(5)); // 5 going down
+            UnityEngine.Debug.Log("Remaining Spawns: " + initialSpawns);
         }
     }
 

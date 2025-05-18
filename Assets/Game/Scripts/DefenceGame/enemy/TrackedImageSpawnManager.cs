@@ -13,7 +13,7 @@ public class TrackedImageSpawnManager : MonoBehaviour
 
     private Coroutine spawnRoutine;
     private int spawnCount = 0;
-    
+
 
     void Start()
     {
@@ -56,12 +56,10 @@ public class TrackedImageSpawnManager : MonoBehaviour
 
         UnityEngine.Debug.Log($"Spawns left - {remainingSpawns - 1}");
 
-        // This method could be called if you want to notify when a spawn happens, but
-        // it's already reflected in the remainingSpawns variable.
+        //May remove later.
         UpdateRemainingSpawns();
     }
 
-    // Optionally add a method to notify others of spawn count changes
     public void UpdateRemainingSpawns()
     {
         if (remainingSpawns <= 0)
