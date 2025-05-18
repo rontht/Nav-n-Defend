@@ -40,8 +40,8 @@ public class InventoryUIManager : MonoBehaviour
                 bonusText.text = $"{item.type}: +{item.value}";
                 
                 // Get the correct count from PlayerStats
-                int itemCount = PlayerStats.Instance.GetItemQuantity(item.id);
-                countText.text = itemCount.ToString();
+                // int itemCount = PlayerStats.Instance.GetItemQuantity(item.id);
+                // countText.text = itemCount.ToString();
 
                 // Optional: Add click handler for item use (e.g., equipping or consuming)
                 Button itemButton = itemSlot.GetComponent<Button>();
