@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Slot 7
   m_EditorClassIdentifier: 
   id: 8c8a3279-45c9-4289-bfd7-d169c00c9190
-  itemName: 
+  itemName: Tier [1] Attack
   description: 
-  cost: 100
+  cost: 50
   icon: {fileID: 21300000, guid: ee9918c30c5cd5c4c8d1077401cb49b1, type: 3}
   maxPlayerOwns: 1
   type: 1
-  value: 10
+  value: 5

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Slot 3
   m_EditorClassIdentifier: 
   id: 5d6a3785-badd-44fa-a621-5768c8952daf
-  itemName: 
+  itemName: Tier [3] HP
   description: 
   cost: 100
   icon: {fileID: 21300000, guid: 888930a314f974b449fe44564bacec88, type: 3}

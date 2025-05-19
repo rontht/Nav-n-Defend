@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Slot 5
   m_EditorClassIdentifier: 
   id: a91758c2-4f63-4499-8565-619e4788d085
-  itemName: 
+  itemName: Tier [1] HP Potion
   description: 
   cost: 10
   icon: {fileID: 21300000, guid: 021eed70ff4db4545bc0633a5b551e7f, type: 3}
