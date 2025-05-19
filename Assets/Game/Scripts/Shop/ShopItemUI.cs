@@ -89,13 +89,29 @@ public class ShopItemUI : MonoBehaviour
             return;
         }
 
-        if (!itemData.isPurchased && PlayerStats.Instance.CanAfford(itemData.cost))
+        // Allow showing confirmation for Temp items even if "purchased" (i.e., owned)
+        // as long as the player can afford it and it's not past the max ownership limit (if any).
+        bool canShowConfirmation = PlayerStats.Instance.CanAfford(itemData.cost);
+        if (itemData.type != ItemType.Temp && itemData.isPurchased)
+        {
+            canShowConfirmation = false; // For non-Temp items, don't show if already purchased.
+        }
+        
+        // Further check for maxPlayerOwns limit for all items
+        if (itemData.maxPlayerOwns != -1 && PlayerStats.Instance.GetOwnedItemCount(itemData.id) >= itemData.maxPlayerOwns)
+        {
+            canShowConfirmation = false;
+            Debug.LogWarning($"Max owned limit reached for {itemData.itemName}. Cannot purchase more.");
+        }
+
+
+        if (canShowConfirmation)
         {
             ShopManager.Instance.ShowPurchaseConfirmation(itemData);
         }
         else
         {
-            Debug.LogWarning($"Conditions NOT MET for purchase. isPurchased={itemData.isPurchased}, currentCoins={PlayerStats.Instance.coins}, cost={itemData.cost}");
+            Debug.LogWarning($"Conditions NOT MET for purchase confirmation. Item: {itemData.itemName}, isPurchased (for non-Temp): {itemData.isPurchased}, currentCoins: {PlayerStats.Instance.coins}, cost: {itemData.cost}, ownedCount: {PlayerStats.Instance.GetOwnedItemCount(itemData.id)}, maxOwns: {itemData.maxPlayerOwns}");
         }
     }
 

@@ -132,10 +132,8 @@ public class PlayerStats : MonoBehaviour
         {
             case ItemType.HP:
                 _maxHP += amount;
-                // Also increase current HP proportionally when max HP increases
-                float healthPercentage = _currentHP / (float)_maxHP;
-                _currentHP = Mathf.RoundToInt(_maxHP * healthPercentage);
-                _currentHP = Mathf.Min(_currentHP, _maxHP);
+                _currentHP += amount; // Increase current HP by the same amount
+                _currentHP = Mathf.Min(_currentHP, _maxHP); // Cap current HP at the new max HP
                 Debug.Log($"MaxHP increased by {amount}. New MaxHP: {_maxHP}, CurrentHP: {_currentHP}");
                 break;
             case ItemType.attack:
