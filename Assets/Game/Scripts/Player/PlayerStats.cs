@@ -20,6 +20,10 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private int startingExpToLevelUp = 10;
     [SerializeField] private int maxLevel = 100;
 
+    // Store the initial base values for linear stat growth
+    private int initialBaseMaxHP;
+    private int initialBaseAttack;
+
     [Header("Current Stats")]
     [SerializeField] private int _maxHP;
     [SerializeField] private int _currentHP;
@@ -67,6 +71,9 @@ public class PlayerStats : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject); // Make this object persistent across scenes
+            // Store the initial base values for linear stat growth
+            initialBaseMaxHP = baseMaxHP;
+            initialBaseAttack = baseAttack;
             LoadStats();
             Debug.Log("PlayerStats Initialized in MainMenu");
         }
@@ -389,9 +396,11 @@ public class PlayerStats : MonoBehaviour
         int oldLeveledBaseMaxHP = baseMaxHP;
         int oldLeveledBaseAttack = baseAttack;
 
-        // Increase current base stats by 20% and round up
-        baseMaxHP = Mathf.CeilToInt(baseMaxHP * 1.20f);
-        baseAttack = Mathf.CeilToInt(baseAttack * 1.20f);
+        // Linear increase: add 20% of the ORIGINAL base per level
+        int hpIncrease = Mathf.CeilToInt(initialBaseMaxHP * 0.2f);
+        int atkIncrease = Mathf.CeilToInt(initialBaseAttack * 0.2f);
+        baseMaxHP += hpIncrease;
+        baseAttack += atkIncrease;
 
         // Calculate the change in base stats
         int deltaBaseHP = baseMaxHP - oldLeveledBaseMaxHP;
