@@ -3144,6 +3144,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1851961329}
+  - component: {fileID: 1851961330}
   m_Layer: 0
   m_Name: StatManager
   m_TagString: Untagged
@@ -3166,6 +3167,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1851961330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1851961327}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f29197cb47b40a94b9e43e30103dcbff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseMaxHP: 100
+  baseAttack: 10
+  startingCoins: 50
+  startingLevel: 1
+  startingExp: 0
+  startingExpToLevelUp: 10
+  maxLevel: 100
+  _maxHP: 0
+  _currentHP: 0
+  _attack: 0
+  _coins: 0
+  _level: 0
+  _currentExp: 0
+  _expToLevelUp: 0
 --- !u!1001 &1869568729
 PrefabInstance:
   m_ObjectHideFlags: 0
