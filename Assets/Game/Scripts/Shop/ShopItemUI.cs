@@ -65,7 +65,12 @@ public class ShopItemUI : MonoBehaviour
 
         if (descriptionText != null)
         {
-            descriptionText.text = $"{itemData.description}\n+{itemData.value} {itemData.type}";
+            string typeText = itemData.type.ToString();
+            if (itemData.type == ItemType.Temp)
+            {
+                typeText = "HP Potion";
+            }
+            descriptionText.text = $"{itemData.description}\n+{itemData.value} {typeText}";
         }
     }    
     /// Handles the purchase button click or XR selection.
