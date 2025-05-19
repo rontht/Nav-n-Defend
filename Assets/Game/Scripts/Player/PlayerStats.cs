@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Text;
 
 [DefaultExecutionOrder(-1)] //initializes before other scripts
 public class PlayerStats : MonoBehaviour
@@ -166,7 +167,33 @@ public class PlayerStats : MonoBehaviour
         PlayerPrefs.SetString(OWNED_ITEM_COUNTS_KEY, ownedItemCountsString);
 
         PlayerPrefs.Save();
-        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}");
+
+        StringBuilder tempItemsLog = new StringBuilder();
+        if (ShopManager.Instance != null && ShopManager.Instance.availableItems != null) 
+        {
+            bool firstTempItem = true;
+            foreach (var entry in ownedItemCounts)
+            {
+                if (entry.Value > 0)
+                {
+                    // Find the item data to check its type
+                    Shop_Item_Data itemData = ShopManager.Instance.availableItems.FirstOrDefault(item => item.id == entry.Key); 
+                    if (itemData != null && itemData.type == ItemType.Temp)
+                    {
+                        if (!firstTempItem)
+                        {
+                            tempItemsLog.Append(", ");
+                        }
+                        tempItemsLog.Append($"{itemData.itemName}: {entry.Value}");
+                        firstTempItem = false;
+                    }
+                }
+            }
+        }
+
+        string tempItemsString = tempItemsLog.Length > 0 ? tempItemsLog.ToString() : "None";
+        
+        Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}, Temp Items: [{tempItemsString}]");
     }
 
     public void LoadStats()
