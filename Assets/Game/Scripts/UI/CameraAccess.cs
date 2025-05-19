@@ -10,9 +10,9 @@ public class NewBehaviourScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        webcam = new WebCamTexture();
-        img.texture = webcam;
-        webcam.Play();
+        // webcam = new WebCamTexture();
+        // img.texture = webcam;
+        // webcam.Play();
     }
 
     // Update is called once per frame
