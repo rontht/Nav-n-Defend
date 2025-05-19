@@ -388,26 +388,23 @@ public class PlayerStats : MonoBehaviour
 
     private void LevelUp()
     {
-        // level up and remove exp
         _currentExp -= _expToLevelUp;
         _level++;
 
-        // Store old base values
-        int oldLeveledBaseMaxHP = baseMaxHP;
-        int oldLeveledBaseAttack = baseAttack;
-
-        // Linear increase: add 20% of the ORIGINAL base per level
-        int hpIncrease = Mathf.CeilToInt(initialBaseMaxHP * 0.2f);
-        int atkIncrease = Mathf.CeilToInt(initialBaseAttack * 0.2f);
-        baseMaxHP += hpIncrease;
-        baseAttack += atkIncrease;
+        // Calculate new base stats based on current level (static increase)
+        int newBaseMaxHP = initialBaseMaxHP + ((_level - 1) * 10); // +10 HP per level (after level 1)
+        int newBaseAttack = initialBaseAttack + ((_level - 1) * 5); // +5 Attack per level (after level 1)
 
         // Calculate the change in base stats
-        int deltaBaseHP = baseMaxHP - oldLeveledBaseMaxHP;
-        int deltaBaseAttack = baseAttack - oldLeveledBaseAttack;
+        int deltaBaseHP = newBaseMaxHP - baseMaxHP;
+        int deltaBaseAttack = newBaseAttack - baseAttack;
 
         // Store old total MaxHP
         float oldTotalMaxHP = _maxHP;
+
+        // Update base stats
+        baseMaxHP = newBaseMaxHP;
+        baseAttack = newBaseAttack;
 
         // Update total stats
         _maxHP += deltaBaseHP;
@@ -427,7 +424,6 @@ public class PlayerStats : MonoBehaviour
 
         Debug.Log($"Leveled up! New Level: {_level}. New Base HP: {baseMaxHP}, New Base ATK: {baseAttack}. Total MaxHP: {_maxHP}, Total ATK: {_attack}. CurrentHP: {_currentHP}");
         
-        // reset the exp to 0 if max level
         if (_level >= maxLevel)
         {
             _currentExp = 0;
