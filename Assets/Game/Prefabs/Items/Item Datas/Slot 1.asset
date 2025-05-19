@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Slot 1
   m_EditorClassIdentifier: 
   id: 03cca5ef-2b24-4ce1-ae3e-175ca36a3e55
-  itemName: 
+  itemName: Tier 3 HP (30)
   description: 
-  cost: 100
-  icon: {fileID: 21300000, guid: 5b1107c6d2a0f904b8033227f55861b2, type: 3}
-  type: 0
-  value: 30
+  cost: 200
+  icon: {fileID: 21300000, guid: 2d0c4ce53a37980449aca0d9e57d53fe, type: 3}
+  maxPlayerOwns: 1
+  type: 1
+  value: 25

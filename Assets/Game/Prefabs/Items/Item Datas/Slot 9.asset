@@ -15,7 +15,8 @@ MonoBehaviour:
   id: 660305f1-78f5-4029-be4a-edd63118644e
   itemName: 
   description: 
-  cost: 50
-  icon: {fileID: 21300000, guid: 6a4eafec8b4d0c2438bceecd7ea71c91, type: 3}
-  type: 2
-  value: 10
+  cost: 1
+  icon: {fileID: 21300000, guid: debbf473597747c40be6ed13273f35b7, type: 3}
+  maxPlayerOwns: -1
+  type: 0
+  value: 1
