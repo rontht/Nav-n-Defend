@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
-/// Handles the shop's currency display UI.
+
 public class ShopUI : MonoBehaviour
 {   
     [Header("UI References")]

@@ -25,16 +25,16 @@ public class Shop_Item_Data : ScriptableObject
     [Header("Shop Settings")]
     public int cost;
     public Sprite icon;
-    public int maxPlayerOwns = -1; // -1 for infinite, now the sole limit
+    public int maxPlayerOwns = -1; // -1 for infinite
 
     [Header("Stat Modification")]
-    public ItemType type; // Now only HP or attack
+    public ItemType type;
     public int value;
 
     /// Checks if this item has been purchased.
     public bool isPurchased => PlayerStats.Instance != null && PlayerStats.Instance.HasPurchasedItem(id);
 
-    /// Unity callback that runs in the editor when this asset is modified.
+    /// callback that runs in the editor when this asset is modified.
     private void OnValidate()
     {
         // Ensure each item has a unique ID

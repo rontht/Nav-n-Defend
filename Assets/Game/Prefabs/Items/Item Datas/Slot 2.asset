@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Slot 2
   m_EditorClassIdentifier: 
   id: e666d986-ea23-4a57-bfb3-46bac030d2e8
-  itemName: 
+  itemName: Tier [3] HP Potion
   description: 
-  cost: 150
-  icon: {fileID: 21300000, guid: a91d4983ab5d68848b3a09d63ce4e17f, type: 3}
-  type: 1
-  value: 20
+  cost: 25
+  icon: {fileID: 21300000, guid: e51f2b22196669e4d8d160a13e0a0a72, type: 3}
+  maxPlayerOwns: 3
+  type: 2
+  value: 25

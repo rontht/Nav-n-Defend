@@ -25,4 +25,6 @@ public class SettingManager : MonoBehaviour
         else
             Debug.Log("Player Stats Instance not found.");
     }
+
+    // add something like changing number of nodes and grid for puzzle game
 }
