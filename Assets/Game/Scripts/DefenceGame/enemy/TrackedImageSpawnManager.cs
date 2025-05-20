@@ -2,14 +2,14 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class TrackedImageSpawnManager : MonoBehaviour
+public class trackedImageSpawnManager : MonoBehaviour
 {
     public Transform[] spawnPoints;
     public GameObject enemyPrefab;
     public float spawnInterval = 5f;
     public int maxSpawns = 9;
     public int remainingSpawns;
-    public static event Action<TrackedImageSpawnManager> OnSpawnManagerReady;
+    public static event Action<trackedImageSpawnManager> OnSpawnManagerReady;
 
     private Coroutine spawnRoutine;
     private int spawnCount = 0;
@@ -48,8 +48,8 @@ public class TrackedImageSpawnManager : MonoBehaviour
         // Instantiate the enemy at the spawn point.
         GameObject enemy = Instantiate(enemyPrefab, spawnPoint.position, spawnPoint.rotation);
 
-        // Reset the health of the enemy (or other components you want to reset).
-        Health enemyHealth = enemy.GetComponent<Health>();
+        // Reset the health of the enemy.
+        health enemyHealth = enemy.GetComponent<health>();
         if (enemyHealth != null)
         {
             enemyHealth.ResetHealth();  // Ensure health is reset to maxHealth value.

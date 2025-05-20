@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using TMPro;
 using System;
 
-public class ImageTrackingToggle : MonoBehaviour
+public class imageTrackingToggle : MonoBehaviour
 {
     private int initialSpawns = 0;
     private int bulletKills = 0;
@@ -27,7 +27,7 @@ public class ImageTrackingToggle : MonoBehaviour
     public TMP_Text bulletKillsText;
 
     // Utilized for subscribing, required for prefab referencing.
-    public TrackedImageSpawnManager spawnManager;
+    public trackedImageSpawnManager spawnManager;
 
     private Coroutine countdownCoroutine;
 
@@ -82,19 +82,19 @@ public class ImageTrackingToggle : MonoBehaviour
     /// </summary>
     void OnEnable()
     {
-        TrackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
-        CenterTriggerDamage.OnStructureDestroyed += HandleStructureDestroyed;
+        trackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
+        centerTriggerDamage.OnStructureDestroyed += HandleStructureDestroyed;
     }
 
     void OnDisable()
     {
-        TrackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
-        CenterTriggerDamage.OnStructureDestroyed -= HandleStructureDestroyed;
+        trackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
+        centerTriggerDamage.OnStructureDestroyed -= HandleStructureDestroyed;
         // Unsubscribe
         enemyHealth.OnKill -= HandleEnemyKill;
     }
 
-    private void HandleSpawnManagerReady(TrackedImageSpawnManager manager)
+    private void HandleSpawnManagerReady(trackedImageSpawnManager manager)
     {
         spawnManager = manager;
 
@@ -126,8 +126,8 @@ public class ImageTrackingToggle : MonoBehaviour
             }
         }
 
-        UnityEngine.Debug.Log("Total Kills Updated: " + kills);
-        UnityEngine.Debug.Log("Bullet Kills Updated: " + bulletKills);
+        // UnityEngine.Debug.Log("Total Kills Updated: " + kills);
+        // UnityEngine.Debug.Log("Bullet Kills Updated: " + bulletKills);
 
         if (kills == initialSpawns)
         {
@@ -141,7 +141,7 @@ public class ImageTrackingToggle : MonoBehaviour
 
     private void HandleStructureDestroyed()
     {
-        UnityEngine.Debug.Log("Structure destroyed triggering Game Over UI.");
+        // UnityEngine.Debug.Log("Structure destroyed triggering Game Over UI.");
         if (gameOverUI != null)
             gameOverUI.SetActive(true);
 

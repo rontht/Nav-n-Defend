@@ -4,19 +4,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-public class Health : MonoBehaviour
+public class health : MonoBehaviour
 {
     private int maxHealth = 125;
     private int currentHealth;
 
     void Start()
     {
-        ResetHealth();  // Ensure health is reset at the start of the object lifecycle
+        ResetHealth();  
     }
 
     public void ResetHealth()
     {
-        currentHealth = maxHealth;  // Reset health to maxHealth
+        currentHealth = maxHealth;  
     }
 
     public void TakeDamage(int amount)

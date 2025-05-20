@@ -3,17 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CenterTriggerDamage : MonoBehaviour
+public class centerTriggerDamage : MonoBehaviour
 {
     private int structureDamageAmount = 25;  
-    private Health structureHealth;
+    private health structureHealth;
 
     public static event Action OnStructureDestroyed;
 
     void Start()
     {
         gameObject.SetActive(true);
-        structureHealth = GetComponent<Health>();
+        structureHealth = GetComponent<health>();
     }
 
     void OnTriggerEnter(Collider other)
