@@ -5,11 +5,21 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using System;
+using System.Diagnostics;
+
+/// <summary>
+/// This seriously needs to be refactored at some point.
+/// If time allows, I'll do so but deadlines are tight. For now, it works.
+/// Refactor would include GameUIManager, GameStateManager, SetTrackers etc
+/// </summary>
 
 public class imageTrackingToggle : MonoBehaviour
 {
     private int initialSpawns = 0;
     private int bulletKills = 0;
+
+    private int shotsMade = 0;
+    private int shotsHit = 0;
 
     [Header("AR Tracking")]
     public ARTrackedImageManager imageManager;
@@ -19,23 +29,28 @@ public class imageTrackingToggle : MonoBehaviour
     public GameObject scanMenu;
     public GameObject qrScanMenu;
     public GameObject countdownHold;
-    public GameObject victoryUI;
-    public GameObject gameOverUI;
     public TMP_Text countdownText;
     public TMP_Text remainingSpawnsText;
     public TMP_Text totalKillsText;
     public TMP_Text bulletKillsText;
 
+    [Header("Shared Stats Panel")]
+    public GameObject statsPanel;
+    public TMP_Text statsShotsMadeText;
+    public TMP_Text statsShotsHitText;
+    public TMP_Text statsAccuracyText;
+
+    public TMP_Text resultMessageText;
+
     // Utilized for subscribing, required for prefab referencing.
     public trackedImageSpawnManager spawnManager;
 
-    private Coroutine countdownCoroutine;
+    private Coroutine countdown;
 
-   /// <summary>
-   /// General UI P1, logic shared for start. When merging games onto same scene, utilize calls here.
-   /// Call your UI and state false, the only one here to be true should be scanMenu.
-   /// </summary>
-    
+    /// <summary>
+    /// General UI Part 1, logic shared for start. When merging games onto same scene, utilize calls here.
+    /// Call your UI and state false, the only one here to be true should be scanMenu.
+    /// </summary>
     void Start()
     {
         if (imageManager != null)
@@ -45,7 +60,7 @@ public class imageTrackingToggle : MonoBehaviour
 
         if (generalUI != null)
         {
-            generalUI.SetActive(false);
+            generalUI.SetActive(false); 
         }
 
         if (scanMenu != null)
@@ -63,34 +78,31 @@ public class imageTrackingToggle : MonoBehaviour
             countdownHold.SetActive(false);
         }
 
-        if (victoryUI != null)
+        if (statsPanel != null)
         {
-            victoryUI.SetActive(false);
+            statsPanel.SetActive(false); 
         }
 
-        if (gameOverUI != null)
-        {
-            gameOverUI.SetActive(false);
-        }
-            // Subscribe to the enemyHealth.OnKill event to listen for kills.
-            enemyHealth.OnKill += HandleEnemyKill;
+        enemyHealth.OnKill += HandleEnemyKill;
     }
 
     /// <summary>
-    /// Subscripions to prefabs start here.
-    /// Prefab UI calls found below.
+    /// Subscriptions to prefab events start here.
     /// </summary>
     void OnEnable()
     {
         trackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
         centerTriggerDamage.OnStructureDestroyed += HandleStructureDestroyed;
+        shooting.OnShotFired += HandleShotFired;
+        enemyHealth.OnEnemyHit += HandleEnemyHit;
     }
 
     void OnDisable()
     {
         trackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
         centerTriggerDamage.OnStructureDestroyed -= HandleStructureDestroyed;
-        // Unsubscribe
+        shooting.OnShotFired -= HandleShotFired;
+        enemyHealth.OnEnemyHit -= HandleEnemyHit;
         enemyHealth.OnKill -= HandleEnemyKill;
     }
 
@@ -107,49 +119,51 @@ public class imageTrackingToggle : MonoBehaviour
         UpdateRemainingSpawnsText();
     }
 
-    // Method to handle enemy kills and update the UI.
     private void HandleEnemyKill(int kills)
     {
-        // Update the total kills text.
         if (totalKillsText != null)
         {
             totalKillsText.text = "Total Kills: " + kills;
         }
 
-        // Check if the cause of death is "Bullet".
+        // Did it die by a bullet?
         if (enemyHealth.lastKillCause == "Bullet")
         {
-            bulletKills++;  // Increment the bullet kills counter.
+            bulletKills++;  // If so, +1
             if (bulletKillsText != null)
             {
                 bulletKillsText.text = "Bullet Kills: " + bulletKills;
             }
         }
 
-        // UnityEngine.Debug.Log("Total Kills Updated: " + kills);
-        // UnityEngine.Debug.Log("Bullet Kills Updated: " + bulletKills);
-
         if (kills == initialSpawns)
         {
-            if (victoryUI != null)
-            {
-                victoryUI.SetActive(true);  // VICTORY AT LAST AAAAAAAAAAAAAAAAH.
-                generalUI.SetActive(false);
-            }
+            ShowEndUI(true); 
         }
     }
 
     private void HandleStructureDestroyed()
     {
-        // UnityEngine.Debug.Log("Structure destroyed triggering Game Over UI.");
-        if (gameOverUI != null)
-            gameOverUI.SetActive(true);
-
-        if (generalUI != null)
-            generalUI.SetActive(false);
+        ShowEndUI(false);
     }
 
-        void Update()
+    private void ShowEndUI(bool isVictory)
+    {
+        if (statsPanel != null)
+        {
+            statsPanel.SetActive(true);
+        }
+
+        if (resultMessageText != null)
+        {
+            resultMessageText.text = isVictory ? "You Won!" : "You Lost!";
+        }
+
+        // Rewards for clear probably go into this method.
+        UpdateStatsSummary();
+    }
+
+    void Update()
     {
         if (spawnManager != null)
         {
@@ -164,10 +178,6 @@ public class imageTrackingToggle : MonoBehaviour
             remainingSpawnsText.text = "Remaining Spawns: " + spawnManager.remainingSpawns;
         }
     }
-
-    /// <summary>
-    /// Prefab UI calls end here.
-    /// </summary>
 
     /// <summary>
     /// General UI P2, Switch to proper QR Scan.
@@ -211,13 +221,13 @@ public class imageTrackingToggle : MonoBehaviour
             qrScanMenu.SetActive(false);
         }
 
-        if (countdownCoroutine == null)
+        if (countdown == null)
         {
             if (countdownHold != null)
             {
                 countdownHold.SetActive(true);
             }
-            countdownCoroutine = StartCoroutine(StartCountdown(5)); // 5 going down
+            countdown = StartCoroutine(StartCountdown(5)); // 5 going down
             UnityEngine.Debug.Log("Remaining Spawns: " + initialSpawns);
         }
     }
@@ -248,6 +258,33 @@ public class imageTrackingToggle : MonoBehaviour
             generalUI.SetActive(true);
         }
 
-        countdownCoroutine = null;
+        countdown = null;
+    }
+
+    private void HandleShotFired()
+    {
+        shotsMade++;
+        //UpdateInGameAccuracyUI();
+    }
+
+    private void HandleEnemyHit()
+    {
+        shotsHit++;
+        //UpdateInGameAccuracyUI();
+    }
+
+    private void UpdateStatsSummary()
+    {
+        if (statsShotsMadeText != null)
+            statsShotsMadeText.text = "Shots Made: " + shotsMade;
+
+        if (statsShotsHitText != null)
+            statsShotsHitText.text = "Shots Hit: " + shotsHit;
+
+        if (statsAccuracyText != null)
+        {
+            float accuracy = shotsMade > 0 ? ((float)shotsHit / shotsMade) * 100f : 0f;
+            statsAccuracyText.text = $"Accuracy: {accuracy:F1}%";
+        }
     }
 }

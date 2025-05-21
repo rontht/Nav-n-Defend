@@ -350,6 +350,8 @@ MonoBehaviour:
   spawnInterval: 5
   maxSpawns: 9
   remainingSpawns: 0
+  liveEnemies: 0
+  doneSpawning: 0
 --- !u!65 &2858982618141376062
 BoxCollider:
   m_ObjectHideFlags: 0

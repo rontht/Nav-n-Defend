@@ -16,11 +16,13 @@ public class bulletDamage : MonoBehaviour
             enemyHealth health = root.GetComponent<enemyHealth>();
             if (health != null)
             {
+                enemyHealth.TriggerEnemyHit();
+
                 health.TakeDamage(damageAmount, "Bullet");
             }
         }
 
         // Remove Bullet.
-        Destroy(gameObject); 
+        Destroy(gameObject);
     }
 }

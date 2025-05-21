@@ -4,7 +4,8 @@ using System.Diagnostics;
 using UnityEngine;
 
 /// <summary>
-/// Antiquated debugging / testing. Keeping for now.
+/// Antiquated but functional. 
+/// Research animation further during break.
 /// </summary>
 
 public class animationStateController : MonoBehaviour

@@ -9,6 +9,8 @@ public class shooting : MonoBehaviour
 
     public Camera arCamera;
 
+    public static event System.Action OnShotFired;
+
     public void ShootSphere()
     {
         if (spherePrefab == null || arCamera == null) return;
@@ -20,6 +22,11 @@ public class shooting : MonoBehaviour
         {
             rb.AddForce(arCamera.transform.forward * shootForce);
         }
+
+        // Notify UI of a shot made.
+        if (OnShotFired != null)
+        {
+            OnShotFired();
+        }
     }
 }
-

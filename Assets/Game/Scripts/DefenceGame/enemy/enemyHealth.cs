@@ -1,24 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
+using System.Collections;
+using System;
+using System.Diagnostics;
 
 public class enemyHealth : MonoBehaviour
 {
     // Variable stat, higher equals more points?
     public int maxHealth = 30;
-
     public static int totalKills = 0;
-    private int currentHealth;
-
     public static string lastKillCause = "Unknown";
 
-    // Create an event to notify when a kill happens.
-    public static event System.Action<int> OnKill; 
+    private int currentHealth;
+
+    // Events
+    public static event Action<int> OnKill;
+    public static event Action OnEnemyHit;
+    public event Action OnDeath;
 
     void Start()
     {
-        currentHealth = maxHealth;
+        ResetHealth();  // Call ResetHealth to initialize health at the start.
+    }
+
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;  // Reset health to maxHealth value.
     }
 
     public void TakeDamage(int amount, string cause = "Unknown")
@@ -42,12 +48,22 @@ public class enemyHealth : MonoBehaviour
         {
             OnKill(totalKills);
         }
-        
-        // OnKill?.Invoke(totalKills);
-        // Supposedly the short hand version for above,
-        // Stumbled upon it when researching subscribing.
 
-        Destroy(gameObject);
+        if (OnDeath != null)
+        {
+            OnDeath();
+        }
+
+        Destroy(gameObject);  // Destroy the enemy object.
         UnityEngine.Debug.Log($"Enemy killed by: {cause}. Total Kills = {totalKills}");
+    }
+
+    // Trigger event from outside this class (e.g. bullet impact)
+    public static void TriggerEnemyHit()
+    {
+        if (OnEnemyHit != null)
+        {
+            OnEnemyHit();
+        }
     }
 }
