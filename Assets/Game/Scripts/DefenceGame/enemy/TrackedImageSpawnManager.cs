@@ -2,6 +2,13 @@ using UnityEngine;
 using System.Collections;
 using System;
 
+/// <summary>
+/// This is attached to the prefab.
+/// This is good for having multiple 
+/// games on a scene. Requires a lot of
+/// events though.
+/// </summary>
+
 public class trackedImageSpawnManager : MonoBehaviour
 {
     public Transform[] spawnPoints;
@@ -26,7 +33,7 @@ public class trackedImageSpawnManager : MonoBehaviour
             spawnRoutine = StartCoroutine(SpawnRoutine());
             UnityEngine.Debug.Log("Started enemy spawning.");
         }
-        OnSpawnManagerReady?.Invoke(this);
+        OnSpawnManagerReady?.Invoke(this); // Just using .?Invoke as a representation of knowing how here.
     }
 
     private IEnumerator SpawnRoutine()
@@ -59,14 +66,14 @@ public class trackedImageSpawnManager : MonoBehaviour
         enemyHealth enemyHealth = enemy.GetComponent<enemyHealth>();
         if (enemyHealth != null)
         {
-            // Assuming health is a separate component on the same enemy object.
+            // Health applied to each spawned unit.
             health enemyHealthComponent = enemy.GetComponent<health>();
             if (enemyHealthComponent != null)
             {
-                enemyHealthComponent.ResetHealth();  // Call ResetHealth from the health class.
+                enemyHealthComponent.resetHealth();  // Call resetHealth from the health class.
             }
 
-            // Subscribe to the OnDeath event to track enemy deaths.
+            // Another subscribe for death.
             enemyHealth.OnDeath += () =>
             {
                 liveEnemies--;
@@ -92,17 +99,20 @@ public class trackedImageSpawnManager : MonoBehaviour
     {
         if (remainingSpawns <= 0)
         {
-            UnityEngine.Debug.Log("No more spawns left.");
+            // UnityEngine.Debug.Log("No more spawns left.");
         }
     }
 
-    // Check for victory condition after every death/spawn completion.
+    // Check for victory!
     private void CheckVictoryCondition()
     {
         if (doneSpawning && liveEnemies <= 0)
         {
-            UnityEngine.Debug.Log("All enemies defeated!");
-            OnAllEnemiesDefeated?.Invoke(); 
+            // UnityEngine.Debug.Log("All enemies defeated!");
+            if (OnAllEnemiesDefeated != null)
+            {
+                OnAllEnemiesDefeated();
+            }
         }
     }
 }

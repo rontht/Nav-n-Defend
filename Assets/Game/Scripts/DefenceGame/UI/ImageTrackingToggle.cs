@@ -21,6 +21,9 @@ public class imageTrackingToggle : MonoBehaviour
     private int shotsMade = 0;
     private int shotsHit = 0;
 
+    // Splitting of these elements for visual clarity
+    // via headers.
+
     [Header("AR Tracking")]
     public ARTrackedImageManager imageManager;
 
@@ -53,6 +56,10 @@ public class imageTrackingToggle : MonoBehaviour
     /// </summary>
     void Start()
     {
+        /// I should note that while I'm aware of ?.,
+        /// this is a bit more clear to everyone 
+        /// as this is our first time with Unity / C#.
+  
         if (imageManager != null)
         {
             imageManager.enabled = false;
@@ -83,7 +90,7 @@ public class imageTrackingToggle : MonoBehaviour
             statsPanel.SetActive(false); 
         }
 
-        enemyHealth.OnKill += HandleEnemyKill;
+        enemyHealth.OnKill += handleEnemyKill;
     }
 
     /// <summary>
@@ -91,22 +98,22 @@ public class imageTrackingToggle : MonoBehaviour
     /// </summary>
     void OnEnable()
     {
-        trackedImageSpawnManager.OnSpawnManagerReady += HandleSpawnManagerReady;
-        centerTriggerDamage.OnStructureDestroyed += HandleStructureDestroyed;
-        shooting.OnShotFired += HandleShotFired;
-        enemyHealth.OnEnemyHit += HandleEnemyHit;
+        trackedImageSpawnManager.OnSpawnManagerReady += handleSpawnManagerReady;
+        centerTriggerDamage.onStructureDestroyed += handleStructureDestroyed;
+        shooting.OnShotFired += handleShotFired;
+        enemyHealth.OnEnemyHit += handleEnemyHit;
     }
 
     void OnDisable()
     {
-        trackedImageSpawnManager.OnSpawnManagerReady -= HandleSpawnManagerReady;
-        centerTriggerDamage.OnStructureDestroyed -= HandleStructureDestroyed;
-        shooting.OnShotFired -= HandleShotFired;
-        enemyHealth.OnEnemyHit -= HandleEnemyHit;
-        enemyHealth.OnKill -= HandleEnemyKill;
+        trackedImageSpawnManager.OnSpawnManagerReady -= handleSpawnManagerReady;
+        centerTriggerDamage.onStructureDestroyed -= handleStructureDestroyed;
+        shooting.OnShotFired -= handleShotFired;
+        enemyHealth.OnEnemyHit -= handleEnemyHit;
+        enemyHealth.OnKill -= handleEnemyKill;
     }
 
-    private void HandleSpawnManagerReady(trackedImageSpawnManager manager)
+    private void handleSpawnManagerReady(trackedImageSpawnManager manager)
     {
         spawnManager = manager;
 
@@ -119,7 +126,7 @@ public class imageTrackingToggle : MonoBehaviour
         UpdateRemainingSpawnsText();
     }
 
-    private void HandleEnemyKill(int kills)
+    private void handleEnemyKill(int kills)
     {
         if (totalKillsText != null)
         {
@@ -142,7 +149,7 @@ public class imageTrackingToggle : MonoBehaviour
         }
     }
 
-    private void HandleStructureDestroyed()
+    private void handleStructureDestroyed()
     {
         ShowEndUI(false);
     }
@@ -227,12 +234,12 @@ public class imageTrackingToggle : MonoBehaviour
             {
                 countdownHold.SetActive(true);
             }
-            countdown = StartCoroutine(StartCountdown(5)); // 5 going down
+            countdown = StartCoroutine(startCountdown(5)); // 5 going down
             UnityEngine.Debug.Log("Remaining Spawns: " + initialSpawns);
         }
     }
 
-    private IEnumerator StartCountdown(int seconds)
+    private IEnumerator startCountdown(int seconds)
     {
         int current = seconds;
 
@@ -261,13 +268,13 @@ public class imageTrackingToggle : MonoBehaviour
         countdown = null;
     }
 
-    private void HandleShotFired()
+    private void handleShotFired()
     {
         shotsMade++;
         //UpdateInGameAccuracyUI();
     }
 
-    private void HandleEnemyHit()
+    private void handleEnemyHit()
     {
         shotsHit++;
         //UpdateInGameAccuracyUI();

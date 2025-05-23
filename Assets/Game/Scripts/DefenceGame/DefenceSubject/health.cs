@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
+
+/// <summary>
+/// Health of defence subject. 
+/// Should be based off of player max HP.
+/// </summary>
 public class health : MonoBehaviour
 {
     private int maxHealth = 100;
@@ -11,21 +16,21 @@ public class health : MonoBehaviour
 
     void Start()
     {
-        ResetHealth();  
+        resetHealth();  
     }
 
-    public void ResetHealth()
+    public void resetHealth()
     {
         currentHealth = maxHealth;  
     }
 
-    public void TakeDamage(int amount)
+    public void takeDamage(int amount)
     {
         currentHealth -= amount;
         UnityEngine.Debug.Log($"Remaining HP - {currentHealth}");
     }
 
-    public int GetCurrentHealth()
+    public int getCurrentHealth()
     {
         return currentHealth;
     }

@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class centerTriggerDamage : MonoBehaviour
 {
-    private int structureDamageAmount = 25;  
+    private int structureDamageAmount = 25; // Attaching this value to a modifier would be good.
     private health structureHealth;
 
-    public static event Action OnStructureDestroyed;
+    public static event Action onStructureDestroyed;
 
     void Start()
     {
@@ -34,16 +34,16 @@ public class centerTriggerDamage : MonoBehaviour
             //Structure structureDamageAmount value.
             if (structureHealth != null)
             {
-                structureHealth.TakeDamage(structureDamageAmount);
+                structureHealth.takeDamage(structureDamageAmount);
                 //UnityEngine.Debug.Log($"Remaining HP - {Health}");
             }
 
-            if (structureHealth.GetCurrentHealth() <= 0)
+            if (structureHealth.getCurrentHealth() <= 0)
             {
 
-                if (OnStructureDestroyed != null)
+                if (onStructureDestroyed != null)
                 {
-                    OnStructureDestroyed();
+                    onStructureDestroyed();
                 }
 
                 gameObject.SetActive(false);

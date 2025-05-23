@@ -5,20 +5,26 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
+/// <summary>
+/// This should work globally and be reused.
+/// Ensure everything involves timeScale in its movement.
+/// </summary>
+
 public class pause : MonoBehaviour
 {
 
-    public GameObject PausePanel;
+    public GameObject pausePanel;
 
     public void Pause()
     {
-        PausePanel.SetActive(true);
+        pausePanel.SetActive(true);
         Time.timeScale = 0;
     }
 
     public void Continue()
     {
-        PausePanel.SetActive(false);
+        pausePanel.SetActive(false);
         Time.timeScale = 1;
     }
 

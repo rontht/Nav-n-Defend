@@ -12,7 +12,7 @@ public class enemyHealth : MonoBehaviour
 
     private int currentHealth;
 
-    // Events
+    // Events.
     public static event Action<int> OnKill;
     public static event Action OnEnemyHit;
     public event Action OnDeath;
@@ -58,7 +58,6 @@ public class enemyHealth : MonoBehaviour
         UnityEngine.Debug.Log($"Enemy killed by: {cause}. Total Kills = {totalKills}");
     }
 
-    // Trigger event from outside this class (e.g. bullet impact)
     public static void TriggerEnemyHit()
     {
         if (OnEnemyHit != null)
