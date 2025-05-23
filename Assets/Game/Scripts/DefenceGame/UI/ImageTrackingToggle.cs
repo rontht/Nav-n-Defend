@@ -17,7 +17,6 @@ public class imageTrackingToggle : MonoBehaviour
 {
     private int initialSpawns = 0;
     private int bulletKills = 0;
-
     private int shotsMade = 0;
     private int shotsHit = 0;
 
@@ -34,7 +33,7 @@ public class imageTrackingToggle : MonoBehaviour
     public GameObject countdownHold;
     public TMP_Text countdownText;
     public TMP_Text remainingSpawnsText;
-    public TMP_Text totalKillsText;
+    // public TMP_Text totalKillsText;
     public TMP_Text bulletKillsText;
 
     [Header("Shared Stats Panel")]
@@ -134,10 +133,10 @@ public class imageTrackingToggle : MonoBehaviour
 
     private void handleEnemyKill(int kills)
     {
-        if (totalKillsText != null)
-        {
-            totalKillsText.text = "Total Kills: " + kills;
-        }
+        // if (totalKillsText != null)
+        // {
+        //     totalKillsText.text = "Total Kills: " + kills;
+        // }
 
         // Did it die by a bullet?
         if (enemyHealth.lastKillCause == "Bullet")
