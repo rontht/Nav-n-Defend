@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class shooting : MonoBehaviour
 {
-    public GameObject spherePrefab;
+    public GameObject spherePrefab; // What the logic should be attached to.
     public float shootForce = 500f;
 
-    public Camera arCamera;
+    public Camera arCamera; // Where the bullet comes out from.
 
-    public static event System.Action OnShotFired;
+    public static event System.Action OnShotFired; // Event for shooting.
 
     public void ShootSphere()
     {
-        if (spherePrefab == null || arCamera == null) return;
+        if (spherePrefab == null || arCamera == null) return; // Layered safety to ensure bullet never fires unless ready. -gun safety!-
 
         GameObject sphere = Instantiate(spherePrefab, arCamera.transform.position + arCamera.transform.forward * 0.5f, Quaternion.identity);
 
@@ -26,7 +26,7 @@ public class shooting : MonoBehaviour
         // Notify UI of a shot made.
         if (OnShotFired != null)
         {
-            OnShotFired();
+            OnShotFired(); // Allows for tracking of things like accuracy, kill count.
         }
     }
 }
