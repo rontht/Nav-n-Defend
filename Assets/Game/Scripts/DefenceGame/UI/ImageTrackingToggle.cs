@@ -90,6 +90,12 @@ public class imageTrackingToggle : MonoBehaviour
             statsPanel.SetActive(false); 
         }
 
+        if (bulletKillsText != null)
+        {
+            bulletKillsText.text = "Bullet Kills: 0";
+        }
+
+
         enemyHealth.OnKill += handleEnemyKill;
     }
 
@@ -161,10 +167,17 @@ public class imageTrackingToggle : MonoBehaviour
             statsPanel.SetActive(true);
         }
 
+        if (generalUI != null)
+        {
+            generalUI.SetActive(false); 
+        }
+
         if (resultMessageText != null)
         {
             resultMessageText.text = isVictory ? "You Won!" : "You Lost!";
         }
+
+        Time.timeScale = 0f;
 
         // Rewards for clear probably go into this method.
         UpdateStatsSummary();
