@@ -13,9 +13,14 @@ public class InventoryUIManager : MonoBehaviour
     [Header("Item Data")]
     public List<Shop_Item_Data> allItems;
 
+    [Header("Equipment Panels")]
+    public GameObject hpEquipmentPanel;
+    public GameObject attackEquipmentPanel;
+
     private void Start()
     {
         PopulateInventory();
+        PopulateEquipment();
     }
 
     private void PopulateInventory()
@@ -57,23 +62,31 @@ public class InventoryUIManager : MonoBehaviour
 
     private void UseItem(Shop_Item_Data item)
     {
-        if (item == null)
+        if (PlayerStats.Instance.GetOwnedItemCount(item.id) <= 0)
         {
-            Debug.LogError("Attempted to use a null item! This should not happen if PopulateInventory is working correctly.");
+            Debug.LogWarning($"Cannot use {item.itemName}. Player does not own any more of this item.");
+            RefreshInventoryUI();
             return;
         }
 
-        Debug.Log($"Used {item.itemName}. Applying {item.type} +{item.value} bonus.");
-        // Shop_Item_Data item
-        // Apply the item's stat bonus
-        PlayerStats.Instance.IncreaseStat(item.type, item.value);
-        UISoundPlayer.Instance.PlayCashSound();
-        // Optionally reduce the item count or remove it from inventory if it is consumable
-        // You can add more logic here if needed (e.g., consuming potions)
+        if (item.type == ItemType.Heal)
+        {
+            // One-time healing effect
+            PlayerStats.Instance.Heal(item.value);
+            PlayerStats.Instance.DecreaseItemCount(item.id, 1);
+            UISoundPlayer.Instance.PlayCashSound();
+        }
+        else
+        {
+            // Equip the item (e.g., HP or attack boost)
+            PlayerStats.Instance.EquipItem(item);
+            PlayerStats.Instance.DecreaseItemCount(item.id, 1);
+            UISoundPlayer.Instance.PlayCashSound();
+            PopulateEquipment();
+        }
 
         // Refresh inventory UI to reflect the change
-        ClearInventoryUI();
-        PopulateInventory();
+        RefreshInventoryUI();
     }
 
     private void ClearInventoryUI()
@@ -83,4 +96,71 @@ public class InventoryUIManager : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+    private void RefreshInventoryUI()
+    {
+        ClearInventoryUI();
+        PopulateInventory();
+    }
+
+    public void PopulateEquipment()
+    {
+        Dictionary<ItemType, Shop_Item_Data> equippedItems = PlayerStats.Instance.GetEquippedItemIDs();
+        Debug.Log("Equipped Items Count: " + equippedItems.Count);
+        // Handle HP Equipment
+        if (equippedItems.TryGetValue(ItemType.HP, out Shop_Item_Data hpItem))
+        {
+            UpdateEquipmentPanel(hpEquipmentPanel, hpItem);
+        }
+        else
+        {
+            ClearEquipmentPanel(hpEquipmentPanel);
+        }
+
+        // Handle Attack Equipment
+        if (equippedItems.TryGetValue(ItemType.attack, out Shop_Item_Data atkItem))
+        {
+            UpdateEquipmentPanel(attackEquipmentPanel, atkItem);
+        }
+        else
+        {
+            ClearEquipmentPanel(attackEquipmentPanel);
+        }
+    }
+
+    private void UpdateEquipmentPanel(GameObject panel, Shop_Item_Data item)
+    {
+        panel.SetActive(true);
+        // Get references inside the panel
+        TextMeshProUGUI nameText = panel.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI bonusText = panel.transform.Find("Bonus").GetComponent<TextMeshProUGUI>();
+        Button unequipButton = panel.transform.Find("UnequipButton").GetComponent<Button>();
+        Image icon = panel.transform.Find("IconPanel/Icon").GetComponent<Image>();
+
+        // Set values
+        nameText.text = item.itemName;
+        bonusText.text = $"{item.type}: +{item.value}";
+        icon.sprite = item.icon;
+
+        // Assign Unequip button action
+        unequipButton.onClick.RemoveAllListeners();
+        unequipButton.onClick.AddListener(() =>
+        {
+            PlayerStats.Instance.UnequipItem(item.type);
+            PopulateEquipment();
+            RefreshInventoryUI();
+        });
+    }
+
+    private void ClearEquipmentPanel(GameObject panel)
+    {
+        panel.SetActive(false);
+        // panel.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = "-";
+        // panel.transform.Find("Bonus").GetComponent<TextMeshProUGUI>().text = "";
+        // panel.transform.Find("IconPanel/Icon").GetComponent<Image>().sprite = null;
+
+        // Button unequipButton = panel.transform.Find("UnequipButton").GetComponent<Button>();
+        // unequipButton.onClick.RemoveAllListeners();
+    }
+
 }

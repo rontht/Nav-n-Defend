@@ -63,7 +63,7 @@ public class ShopManager : MonoBehaviour
             }
 
             PlayerStats.Instance.SpendCoins(item.cost);
-            PlayerStats.Instance.IncreaseStat(item.type, item.value);
+            // PlayerStats.Instance.IncreaseStat(item.type, item.value);
 
             // Only mark as purchased if it's not a consumable or if it's within limits
             if (item.type != ItemType.Heal) // Temp items are consumable and not marked as purchased

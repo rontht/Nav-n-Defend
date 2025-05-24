@@ -45,6 +45,8 @@ public class PlayerStats : MonoBehaviour
     private List<string> purchasedItemIDs = new List<string>();
     // Dictionary to store the count of owned items
     private Dictionary<string, int> ownedItemCounts = new Dictionary<string, int>();
+    // Dictionary to store currently equipped items by their ItemType (e.g., one HP item, one Attack item)
+    private Dictionary<ItemType, Shop_Item_Data> equippedItemIDs = new Dictionary<ItemType, Shop_Item_Data>();
 
     // Constants for PlayerPrefs Keys
     private const string COINS_KEY = "PlayerCoins";
@@ -115,35 +117,6 @@ public class PlayerStats : MonoBehaviour
         onCoinsChanged?.Invoke();
     }
 
-    /// Increases a specific stat by the given amount and updates the player state
-    public void IncreaseStat(ItemType statType, int amount)
-    {
-        switch (statType)
-        {
-            case ItemType.HP:
-                _maxHP += amount;
-                _currentHP += amount; // Increase current HP by the same amount
-                _currentHP = Mathf.Min(_currentHP, _maxHP); // Cap current HP at the new max HP
-                Debug.Log($"MaxHP increased by {amount}. New MaxHP: {_maxHP}, CurrentHP: {_currentHP}");
-                break;
-            case ItemType.attack:
-                _attack += amount;
-                Debug.Log($"Attack increased by {amount}. New Attack: {_attack}");
-                break;
-            case ItemType.Heal:
-                Heal(amount);
-                Debug.Log($"Player healed by {amount}. CurrentHP: {_currentHP}");
-                break;
-        }
-        SaveStats();
-        onStatsChanged?.Invoke();
-    }
-
-    public bool IsItemPurchased(string itemID)
-    {
-        return purchasedItemIDs.Contains(itemID);
-    }
-
     /// Saves all player stats and purchased items to PlayerPrefs.
     public void SaveStats()
     {
@@ -211,7 +184,6 @@ public class PlayerStats : MonoBehaviour
         _attack = PlayerPrefs.GetInt(ATK_KEY, baseAttack);
         _currentHP = PlayerPrefs.GetInt(CURRENT_HP_KEY, _maxHP); // Default current HP to loaded max HP
 
-
         string purchasedItemsString = PlayerPrefs.GetString(PURCHASED_ITEMS_KEY, "");
         if (!string.IsNullOrEmpty(purchasedItemsString))
         {
@@ -255,6 +227,7 @@ public class PlayerStats : MonoBehaviour
         baseMaxHP = 100;
         baseAttack = 10;
 
+
         // Total stats become the L1 base stats
         _maxHP = baseMaxHP;
         _currentHP = baseMaxHP;
@@ -262,50 +235,13 @@ public class PlayerStats : MonoBehaviour
 
         purchasedItemIDs.Clear(); // Clear all purchased items
         ownedItemCounts.Clear(); // Clear all owned item counts
+        equippedItemIDs.Clear();
 
         SaveStats(); // Save the reset stats
         onCoinsChanged?.Invoke();
         onStatsChanged?.Invoke();
 
         Debug.Log("Player stats have been reset to default values.");
-    }
-
-    /// Recalculates all player stats based on base values and purchased items.
-    public void RecalculateStatsFromItems(List<Shop_Item_Data> allShopItems)
-    {
-        // Store current HP before recalculation
-        int previousCurrentHP = _currentHP;
-
-        // Reset stats to base values
-        _maxHP = baseMaxHP;
-        _attack = baseAttack;
-
-        foreach (string itemID in purchasedItemIDs)
-        {
-            Shop_Item_Data item = allShopItems.FirstOrDefault(i => i.id == itemID);
-            if (item != null)
-            {
-                switch (item.type)
-                {
-                    case ItemType.HP:
-                        _maxHP += item.value;
-                        break;
-                    case ItemType.attack:
-                        _attack += item.value;
-                        break;
-                    // Temp items are not recalculated as they are consumables
-                    case ItemType.Heal:
-                        break;
-                }
-            }
-        }
-
-
-        _currentHP = previousCurrentHP;
-        _currentHP = Mathf.Clamp(_currentHP, 1, _maxHP);
-        Debug.Log($"Stats recalculated. HP: {_currentHP}/{_maxHP}, ATK: {_attack}");
-        SaveStats();
-        onStatsChanged?.Invoke();
     }
 
     public bool HasPurchasedItem(string itemId)
@@ -344,8 +280,144 @@ public class PlayerStats : MonoBehaviour
         return new List<string>(purchasedItemIDs);
     }
 
+    public Dictionary<ItemType, Shop_Item_Data> GetEquippedItemIDs()
+    {
+        return equippedItemIDs;
+    }
 
+    private void RemoveFromPurchasedItems(string itemId)
+    {
+        if (purchasedItemIDs.Contains(itemId))
+        {
+            purchasedItemIDs.Remove(itemId);
+        }
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
 
+    public void EquipItem(Shop_Item_Data item)
+    {
+        if (item == null)
+        {
+            Debug.LogWarning("Attempted to equip a null item.");
+            return;
+        }
+
+        ItemType type = item.type;
+
+        // If same type is already equipped, unequip it first
+        if (equippedItemIDs.ContainsKey(type))
+        {
+            UnequipItem(type);
+        }
+
+        // Equip the new item
+        equippedItemIDs[type] = item;
+
+        // Apply stat bonus
+        switch (type)
+        {
+            case ItemType.HP:
+                _maxHP += item.value;
+                _currentHP = Mathf.Min(_currentHP, maxHP);
+                break;
+            case ItemType.attack:
+                _attack += item.value;
+                break;
+        }
+
+        // Reduce inventory count
+        if (ownedItemCounts.ContainsKey(item.id))
+        {
+            ownedItemCounts[item.id]--;
+            if (ownedItemCounts[item.id] <= 0)
+            {
+                ownedItemCounts.Remove(item.id);
+            }
+        }
+
+        Debug.Log($"Equipped item {item.itemName} ({type}).");
+
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    public void UnequipItem(ItemType type)
+    {
+        if (!equippedItemIDs.ContainsKey(type)) return;
+
+        Shop_Item_Data item = equippedItemIDs[type];
+
+        // Remove bonuses
+        switch (type)
+        {
+            case ItemType.HP:
+                _maxHP -= item.value;
+                _currentHP = Mathf.Min(_currentHP, maxHP); // Clamp current HP
+                break;
+            case ItemType.attack:
+                _attack -= item.value;
+                break;
+        }
+        
+        UISoundPlayer.Instance.PlayBackwardClickSound();
+        // Return item to inventory
+        if (ownedItemCounts.ContainsKey(item.id))
+        {
+            IncreaseItemCount(item.id, 1);
+            ownedItemCounts[item.id]++;
+        }
+        else
+        {
+            ownedItemCounts[item.id] = 1;
+        }
+
+        equippedItemIDs.Remove(type);
+
+        Debug.Log($"Unequipped item {item.itemName} ({type}). Returned to inventory.");
+
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    public void DecreaseItemCount(string itemId, int amount)
+    {
+        if (ownedItemCounts.ContainsKey(itemId))
+        {
+            ownedItemCounts[itemId] -= amount;
+            if (ownedItemCounts[itemId] <= 0)
+            {
+                ownedItemCounts.Remove(itemId);
+                RemoveFromPurchasedItems(itemId);
+            }
+            SaveStats();
+            onStatsChanged?.Invoke();
+        }
+    }
+
+    public void IncreaseItemCount(string itemId, int amount)
+    {
+        if (ownedItemCounts.ContainsKey(itemId))
+        {
+            ownedItemCounts[itemId] += amount;
+        }
+        else
+        {
+            ownedItemCounts[itemId] = amount;
+            AddToPurchasedItems(itemId);
+        }
+
+        SaveStats();
+        onStatsChanged?.Invoke();
+    }
+
+    private void AddToPurchasedItems(string itemId)
+    {
+        if (!purchasedItemIDs.Contains(itemId))
+        {
+            purchasedItemIDs.Add(itemId);
+        }
+    }
 
     /// Experience and Leveling Methods
     public void GainExperience(int amount)
@@ -424,6 +496,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Heal(int amount)
     {
+        Debug.Log("Current: " + _currentHP + " Heal: " + amount);
         _currentHP = Mathf.Min(_maxHP, _currentHP + amount);
         SaveStats();
         onStatsChanged?.Invoke();
