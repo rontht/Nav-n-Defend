@@ -11,17 +11,26 @@ using UnityEngine;
 /// </summary>
 public class health : MonoBehaviour
 {
-    private int maxHealth = PlayerStats.Instance.maxHP;
+    private int maxHealth;
     private int currentHealth;
 
-    void Start()
+    void Awake()
     {
-        resetHealth();  
+        if (PlayerStats.Instance != null)
+        {
+            maxHealth = PlayerStats.Instance.maxHP;
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning("PlayerStats.Instance is null! Using fallback value.");
+            maxHealth = 150;
+        }
+        resetHealth();
     }
 
     public void resetHealth()
     {
-        currentHealth = maxHealth;  
+        currentHealth = maxHealth;
     }
 
     public void takeDamage(int amount)

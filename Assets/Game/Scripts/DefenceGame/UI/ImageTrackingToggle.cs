@@ -39,6 +39,7 @@ public class imageTrackingToggle : MonoBehaviour
     public TMP_Text remainingSpawnsText;
     public TMP_Text bulletKillsText;
     public TMP_Text structureHpText;
+    public Slider hpSlider;
     // public TMP_Text totalKillsText;
 
     [Header("Shared Stats Panel")]
@@ -78,7 +79,7 @@ public class imageTrackingToggle : MonoBehaviour
 
         if (generalUI != null)
         {
-            generalUI.SetActive(false); 
+            generalUI.SetActive(false);
         }
 
         if (scanMenu != null)
@@ -98,7 +99,7 @@ public class imageTrackingToggle : MonoBehaviour
 
         if (endPanel != null)
         {
-            endPanel.SetActive(false); 
+            endPanel.SetActive(false);
         }
 
         if (bulletKillsText != null)
@@ -150,7 +151,13 @@ public class imageTrackingToggle : MonoBehaviour
     {
         if (structureHpText != null)
         {
-            structureHpText.text = $"Structure HP: {currentHp}";
+            structureHpText.text = $"HP: {currentHp} / {PlayerStats.Instance.maxHP}";
+        }
+
+        if (hpSlider != null)
+        {
+            hpSlider.maxValue = PlayerStats.Instance.maxHP;
+            hpSlider.value = currentHp;
         }
     }
 
@@ -173,7 +180,7 @@ public class imageTrackingToggle : MonoBehaviour
 
         if (kills == initialSpawns)
         {
-            ShowEndUI(true); 
+            ShowEndUI(true);
         }
     }
 
@@ -191,7 +198,7 @@ public class imageTrackingToggle : MonoBehaviour
 
         if (generalUI != null)
         {
-            generalUI.SetActive(false); 
+            generalUI.SetActive(false);
         }
 
         if (resultMessageText != null)
@@ -219,7 +226,7 @@ public class imageTrackingToggle : MonoBehaviour
             expEarned = 3;
             // PlayerStats.Instance.TakeDamage(10);
         }
-            Time.timeScale = 0f;
+        Time.timeScale = 0f;
 
         PlayerStats.Instance.AddCoins(coinsEarned);
         PlayerStats.Instance.GainExperience(expEarned);
