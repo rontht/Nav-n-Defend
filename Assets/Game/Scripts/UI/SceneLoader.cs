@@ -11,5 +11,6 @@ public class SceneLoader : MonoBehaviour
         }
 
         SceneManager.LoadScene(SceneIndex);
+        UISoundPlayer.Instance.PlayForwardClickSound();
     }
 }
