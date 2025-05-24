@@ -11,12 +11,11 @@ using UnityEngine;
 /// </summary>
 public class health : MonoBehaviour
 {
-    private int maxHealth = 150;
+    private int maxHealth = PlayerStats.Instance.maxHP;
     private int currentHealth;
 
     void Start()
     {
-        maxHealth = PlayerStats.Instance.currentHP;
         resetHealth();  
     }
 

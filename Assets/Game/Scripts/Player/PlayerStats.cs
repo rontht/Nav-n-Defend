@@ -41,6 +41,10 @@ public class PlayerStats : MonoBehaviour
     public int expToLevelUp => _expToLevelUp;
     public int level => _level;
 
+   /// <summary>
+   /// public slimeDamage = 25;  /// Quick and dirty slime damage because I can't be bothered making ANOTHER event LISTENER GOD UUUUUGH
+   /// </summary>
+
     // List to store the IDs of purchased items
     private List<string> purchasedItemIDs = new List<string>();
     // Dictionary to store the count of owned items

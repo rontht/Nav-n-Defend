@@ -8,13 +8,24 @@ public class centerTriggerDamage : MonoBehaviour
     private int structureDamageAmount = 25; // Attaching this value to a modifier would be good.
     private health structureHealth;
 
-    public static event Action onStructureDestroyed;
+    public static event Action onStructureDestroyed; // Void paramater, don't confuse with below.
+
+    public static event Action<int> onStructureDamaged; // Int paramater, specific event for tracking the HP. Don't confuse with above.
 
     void Start()
     {
         gameObject.SetActive(true);
         structureHealth = GetComponent<health>();
+
+        if (structureHealth != null)
+        {
+            // Ensure health is reset and initialized before notifying
+            structureHealth.resetHealth();
+
+            onStructureDamaged?.Invoke(structureHealth.getCurrentHealth());
+        }
     }
+
 
     void OnTriggerEnter(Collider other)
     {
@@ -35,6 +46,12 @@ public class centerTriggerDamage : MonoBehaviour
             if (structureHealth != null)
             {
                 structureHealth.takeDamage(structureDamageAmount);
+
+                if (onStructureDamaged != null)
+                {
+                    onStructureDamaged(structureHealth.getCurrentHealth()); // Track current HP.
+                }
+
                 //UnityEngine.Debug.Log($"Remaining HP - {Health}");
             }
 
