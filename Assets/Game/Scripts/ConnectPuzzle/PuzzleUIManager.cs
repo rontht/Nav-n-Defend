@@ -10,7 +10,8 @@ public class PuzzleUIManager : MonoBehaviour
     public GameObject scorePanel;
     public Button finishButton;
     public GameObject winPanel;
-    public TMP_Text reward;
+    public TMP_Text rewardCoins;
+    public TMP_Text rewardExp;
     public GameObject scanUI;
 
     [Header("Game Configs")]
@@ -64,7 +65,8 @@ public class PuzzleUIManager : MonoBehaviour
             scorePanel.SetActive(false);
             winPanel.SetActive(true);
 
-            reward.text = $"{expReward} experience, {coinReward} coins";
+            rewardExp.text = $"EXP Earned: {expReward}";
+            rewardCoins.text = $"Coins Earned: {coinReward}";
             isPuzzleActive = false;
 
             PlayerStats.Instance.GainExperience(expReward);
