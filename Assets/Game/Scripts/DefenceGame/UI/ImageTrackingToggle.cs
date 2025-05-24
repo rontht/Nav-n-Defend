@@ -22,6 +22,7 @@ public class imageTrackingToggle : MonoBehaviour
     private int coinsEarned = 0;
     private int expEarned = 0;
     private int hpLost = 10;
+    private int firstStepHP;
 
     // Splitting of these elements for visual clarity
     // via headers.
@@ -36,8 +37,9 @@ public class imageTrackingToggle : MonoBehaviour
     public GameObject countdownHold;
     public TMP_Text countdownText;
     public TMP_Text remainingSpawnsText;
-    // public TMP_Text totalKillsText;
     public TMP_Text bulletKillsText;
+    public TMP_Text structureHpText;
+    // public TMP_Text totalKillsText;
 
     [Header("Shared Stats Panel")]
     public GameObject endPanel;
@@ -61,10 +63,14 @@ public class imageTrackingToggle : MonoBehaviour
     /// </summary>
     void Start()
     {
+
+        firstStepHP = PlayerStats.Instance.currentHP;
+
+        UnityEngine.Debug.Log("Max HP at Start: " + firstStepHP);
         /// I should note that while I'm aware of ?.,
         /// this is a bit more clear to everyone 
         /// as this is our first time with Unity / C#.
-  
+
         if (imageManager != null)
         {
             imageManager.enabled = false;
@@ -100,8 +106,8 @@ public class imageTrackingToggle : MonoBehaviour
             bulletKillsText.text = "Bullet Kills: 0";
         }
 
-
         enemyHealth.OnKill += handleEnemyKill;
+
     }
 
     /// <summary>
@@ -111,6 +117,7 @@ public class imageTrackingToggle : MonoBehaviour
     {
         trackedImageSpawnManager.OnSpawnManagerReady += handleSpawnManagerReady;
         centerTriggerDamage.onStructureDestroyed += handleStructureDestroyed;
+        centerTriggerDamage.onStructureDamaged += handleStructureHpUpdate; // tracking HP
         shooting.OnShotFired += handleShotFired;
         enemyHealth.OnEnemyHit += handleEnemyHit;
     }
@@ -119,6 +126,7 @@ public class imageTrackingToggle : MonoBehaviour
     {
         trackedImageSpawnManager.OnSpawnManagerReady -= handleSpawnManagerReady;
         centerTriggerDamage.onStructureDestroyed -= handleStructureDestroyed;
+        centerTriggerDamage.onStructureDamaged -= handleStructureHpUpdate;
         shooting.OnShotFired -= handleShotFired;
         enemyHealth.OnEnemyHit -= handleEnemyHit;
         enemyHealth.OnKill -= handleEnemyKill;
@@ -135,6 +143,15 @@ public class imageTrackingToggle : MonoBehaviour
         }
 
         UpdateRemainingSpawnsText();
+    }
+
+
+    private void handleStructureHpUpdate(int currentHp)
+    {
+        if (structureHpText != null)
+        {
+            structureHpText.text = $"Structure HP: {currentHp}";
+        }
     }
 
     private void handleEnemyKill(int kills)
