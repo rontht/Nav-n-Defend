@@ -23,6 +23,8 @@ public class shooting : MonoBehaviour
             rb.AddForce(arCamera.transform.forward * shootForce);
         }
 
+        Destroy(sphere, 2f); // Cleanup shots missed.
+
         // Notify UI of a shot made.
         if (OnShotFired != null)
         {
