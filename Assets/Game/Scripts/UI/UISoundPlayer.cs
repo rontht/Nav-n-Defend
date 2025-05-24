@@ -10,13 +10,19 @@ public class UISoundPlayer : MonoBehaviour
     [Header("UI Audio Clips")]
     public AudioClip ForwardClickSound;
     public AudioClip BackwardClickSound;
+    public AudioClip LevelUpSound;
+    public AudioClip CashSound;
 
     [Header("Game Audio Clips")]
     public AudioClip VictorySound;
     public AudioClip DefeatSound;
     public AudioClip AttackClickSound;
     public AudioClip PauseSound;
-
+    public AudioClip CountdownTick;
+    public AudioClip GameStartSound;
+    public AudioClip ConnectSound;
+    public AudioClip HightlightSound;
+    public AudioClip DeathSound;
 
     private void Awake()
     {
@@ -63,6 +69,37 @@ public class UISoundPlayer : MonoBehaviour
 
     public void PlayCashSound()
     {
-        audioSource.PlayOneShot(VictorySound);
+        audioSource.PlayOneShot(CashSound);
     }
+
+    public void PlayCountdownTickSound()
+    {
+        audioSource.PlayOneShot(CountdownTick);
+    }
+
+    public void PlayLevelUpSound()
+    {
+        audioSource.PlayOneShot(LevelUpSound);
+    }
+
+    public void PlayGameStartSound()
+    {
+        audioSource.PlayOneShot(GameStartSound);
+    }
+
+    public void PlayDeathSound()
+    {
+        audioSource.PlayOneShot(DeathSound);
+    }
+
+    public void PlayConnectSound()
+    {
+        audioSource.PlayOneShot(ConnectSound);
+    }
+
+    public void PlayHightlightSound()
+    {
+        audioSource.PlayOneShot(HightlightSound);
+    }
+    
 }

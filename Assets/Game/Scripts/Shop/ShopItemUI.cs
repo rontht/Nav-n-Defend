@@ -65,7 +65,7 @@ public class ShopItemUI : MonoBehaviour
         if (descriptionText != null)
         {
             string typeText = itemData.type.ToString();
-            if (itemData.type == ItemType.Temp)
+            if (itemData.type == ItemType.Heal)
             {
                 typeText = "HP Potion";
             }
@@ -91,7 +91,7 @@ public class ShopItemUI : MonoBehaviour
         // Allow showing confirmation for Temp items even if purchased
         // as long as the player can afford it and it's not past the max ownership limit.
         bool canShowConfirmation = PlayerStats.Instance.CanAfford(itemData.cost);
-        if (itemData.type != ItemType.Temp && itemData.isPurchased)
+        if (itemData.type != ItemType.Heal && itemData.isPurchased)
         {
             canShowConfirmation = false; // For non-Temp items, don't show if already purchased.
         }
@@ -126,7 +126,7 @@ public class ShopItemUI : MonoBehaviour
         int ownedCount = PlayerStats.Instance.GetOwnedItemCount(itemData.id);
         bool canAfford = PlayerStats.Instance.CanAfford(itemData.cost);
 
-        if (itemData.type == ItemType.Temp)
+        if (itemData.type == ItemType.Heal)
         {
             if (itemData.maxPlayerOwns != -1 && ownedCount >= itemData.maxPlayerOwns)
             {

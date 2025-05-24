@@ -40,7 +40,7 @@ public class imageTrackingToggle : MonoBehaviour
     public TMP_Text bulletKillsText;
 
     [Header("Shared Stats Panel")]
-    public GameObject statsPanel;
+    public GameObject endPanel;
     public TMP_Text statsShotsMadeText;
     public TMP_Text statsShotsHitText;
     public TMP_Text statsAccuracyText;
@@ -90,9 +90,9 @@ public class imageTrackingToggle : MonoBehaviour
             countdownHold.SetActive(false);
         }
 
-        if (statsPanel != null)
+        if (endPanel != null)
         {
-            statsPanel.SetActive(false); 
+            endPanel.SetActive(false); 
         }
 
         if (bulletKillsText != null)
@@ -167,9 +167,9 @@ public class imageTrackingToggle : MonoBehaviour
 
     private void ShowEndUI(bool isVictory)
     {
-        if (statsPanel != null)
+        if (endPanel != null)
         {
-            statsPanel.SetActive(true);
+            endPanel.SetActive(true);
         }
 
         if (generalUI != null)
@@ -180,6 +180,14 @@ public class imageTrackingToggle : MonoBehaviour
         if (resultMessageText != null)
         {
             resultMessageText.text = isVictory ? "You Won!" : "You Lost!";
+            if (isVictory)
+            {
+                UISoundPlayer.Instance.PlayVictorySound();
+            }
+            else
+            {
+                UISoundPlayer.Instance.PlayDefeatSound();
+            }
         }
 
         if (isVictory == true)
@@ -284,13 +292,14 @@ public class imageTrackingToggle : MonoBehaviour
             if (countdownText != null)
             {
                 countdownText.text = current.ToString();
+                UISoundPlayer.Instance.PlayCountdownTickSound();
             }
             yield return new WaitForSeconds(1f);
             current--;
         }
 
         yield return new WaitForSeconds(0.5f);
-
+        UISoundPlayer.Instance.PlayGameStartSound();
         if (countdownHold != null)
         {
             countdownHold.SetActive(false);

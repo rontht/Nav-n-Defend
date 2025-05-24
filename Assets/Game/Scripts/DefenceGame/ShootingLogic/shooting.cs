@@ -15,6 +15,7 @@ public class shooting : MonoBehaviour
     {
         if (spherePrefab == null || arCamera == null) return; // Layered safety to ensure bullet never fires unless ready. -gun safety!-
 
+        UISoundPlayer.Instance.PlayAttackClickSound();
         GameObject sphere = Instantiate(spherePrefab, arCamera.transform.position + arCamera.transform.forward * 0.5f, Quaternion.identity);
 
         Rigidbody rb = sphere.GetComponent<Rigidbody>();

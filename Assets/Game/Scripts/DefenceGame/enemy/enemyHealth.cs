@@ -53,7 +53,7 @@ public class enemyHealth : MonoBehaviour
         {
             OnDeath();
         }
-
+        UISoundPlayer.Instance.PlayDeathSound();
         Destroy(gameObject);  // Destroy the enemy object.
         UnityEngine.Debug.Log($"Enemy killed by: {cause}. Total Kills = {totalKills}");
     }

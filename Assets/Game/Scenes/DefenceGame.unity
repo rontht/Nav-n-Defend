@@ -2553,7 +2553,7 @@ MonoBehaviour:
   countdownText: {fileID: 4256384188598106108}
   remainingSpawnsText: {fileID: 1147344424}
   bulletKillsText: {fileID: 2067276732}
-  statsPanel: {fileID: 1139761537}
+  endPanel: {fileID: 1139761537}
   statsShotsMadeText: {fileID: 2126608014}
   statsShotsHitText: {fileID: 6107096}
   statsAccuracyText: {fileID: 602338840}

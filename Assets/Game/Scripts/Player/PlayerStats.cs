@@ -11,8 +11,8 @@ public class PlayerStats : MonoBehaviour
     public static PlayerStats Instance { get; private set; }
 
     [Header("Base Stats")]
-    [SerializeField] private int baseMaxHP = 100; 
-    [SerializeField] private int baseAttack = 10;   
+    [SerializeField] private int baseMaxHP = 100;
+    [SerializeField] private int baseAttack = 10;
     [SerializeField] private int startingCoins = 50;
     [SerializeField] private int startingLevel = 1;
     [SerializeField] private int startingExp = 0;
@@ -52,12 +52,12 @@ public class PlayerStats : MonoBehaviour
     private const string CURRENT_HP_KEY = "PlayerCurrentHP";
     private const string ATK_KEY = "PlayerAttack";
     private const string PURCHASED_ITEMS_KEY = "PurchasedItems";
-    private const string OWNED_ITEM_COUNTS_KEY = "OwnedItemCounts"; 
+    private const string OWNED_ITEM_COUNTS_KEY = "OwnedItemCounts";
     private const string LEVEL_KEY = "PlayerLevel";
     private const string EXP_KEY = "PlayerExp";
     private const string EXP_TO_LEVEL_KEY = "PlayerExpToLevelUp";
-    private const string BASE_MAX_HP_KEY = "PlayerLeveledBaseMaxHP"; 
-    private const string BASE_ATTACK_KEY = "PlayerLeveledBaseAttack"; 
+    private const string BASE_MAX_HP_KEY = "PlayerLeveledBaseMaxHP";
+    private const string BASE_ATTACK_KEY = "PlayerLeveledBaseAttack";
 
     public event Action onCoinsChanged;
     public event Action onStatsChanged;
@@ -66,7 +66,7 @@ public class PlayerStats : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); 
+            DontDestroyOnLoad(gameObject);
             initialBaseMaxHP = baseMaxHP;
             initialBaseAttack = baseAttack;
             LoadStats();
@@ -74,7 +74,7 @@ public class PlayerStats : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
     }
 
@@ -130,7 +130,7 @@ public class PlayerStats : MonoBehaviour
                 _attack += amount;
                 Debug.Log($"Attack increased by {amount}. New Attack: {_attack}");
                 break;
-            case ItemType.Temp:
+            case ItemType.Heal:
                 Heal(amount);
                 Debug.Log($"Player healed by {amount}. CurrentHP: {_currentHP}");
                 break;
@@ -169,7 +169,7 @@ public class PlayerStats : MonoBehaviour
         PlayerPrefs.Save();
 
         StringBuilder tempItemsLog = new StringBuilder();
-        if (ShopManager.Instance != null && ShopManager.Instance.availableItems != null) 
+        if (ShopManager.Instance != null && ShopManager.Instance.availableItems != null)
         {
             bool firstTempItem = true;
             foreach (var entry in ownedItemCounts)
@@ -177,8 +177,8 @@ public class PlayerStats : MonoBehaviour
                 if (entry.Value > 0)
                 {
                     // Find the item data to check its type
-                    Shop_Item_Data itemData = ShopManager.Instance.availableItems.FirstOrDefault(item => item.id == entry.Key); 
-                    if (itemData != null && itemData.type == ItemType.Temp)
+                    Shop_Item_Data itemData = ShopManager.Instance.availableItems.FirstOrDefault(item => item.id == entry.Key);
+                    if (itemData != null && itemData.type == ItemType.Heal)
                     {
                         if (!firstTempItem)
                         {
@@ -192,7 +192,7 @@ public class PlayerStats : MonoBehaviour
         }
 
         string tempItemsString = tempItemsLog.Length > 0 ? tempItemsLog.ToString() : "None";
-        
+
         Debug.Log($"Saved - HP: {_currentHP}/{_maxHP}, ATK: {_attack}, Coins: {_coins}, Level: {_level}, EXP: {_currentExp}/{_expToLevelUp}, Temp Items: [{tempItemsString}]");
     }
 
@@ -252,14 +252,14 @@ public class PlayerStats : MonoBehaviour
         _expToLevelUp = startingExpToLevelUp;
 
         // Reset base stats to their absolute L1 defaults
-        baseMaxHP = 100; 
-        baseAttack = 10;    
+        baseMaxHP = 100;
+        baseAttack = 10;
 
         // Total stats become the L1 base stats
         _maxHP = baseMaxHP;
-        _currentHP = baseMaxHP; 
+        _currentHP = baseMaxHP;
         _attack = baseAttack;
-        
+
         purchasedItemIDs.Clear(); // Clear all purchased items
         ownedItemCounts.Clear(); // Clear all owned item counts
 
@@ -294,13 +294,13 @@ public class PlayerStats : MonoBehaviour
                         _attack += item.value;
                         break;
                     // Temp items are not recalculated as they are consumables
-                    case ItemType.Temp: 
+                    case ItemType.Heal:
                         break;
                 }
             }
         }
 
-        
+
         _currentHP = previousCurrentHP;
         _currentHP = Mathf.Clamp(_currentHP, 1, _maxHP);
         Debug.Log($"Stats recalculated. HP: {_currentHP}/{_maxHP}, ATK: {_attack}");
@@ -339,34 +339,11 @@ public class PlayerStats : MonoBehaviour
         return ownedItemCounts.TryGetValue(itemId, out int count) ? count : 0;
     }
 
-    private void SavePurchasedItems()
+    public List<string> GetPurchasedItemIDs()
     {
-        string purchasedItemsStr = string.Join(",", purchasedItemIDs);
-        PlayerPrefs.SetString(PURCHASED_ITEMS_KEY, purchasedItemsStr);
-        PlayerPrefs.Save();
+        return new List<string>(purchasedItemIDs);
     }
 
-    private void LoadPurchasedItems()
-    {
-        string purchasedItemsStr = PlayerPrefs.GetString(PURCHASED_ITEMS_KEY, "");
-        purchasedItemIDs = string.IsNullOrEmpty(purchasedItemsStr)
-            ? new List<string>()
-            : purchasedItemsStr.Split(',').ToList();
-
-        string ownedItemCountsString = PlayerPrefs.GetString(OWNED_ITEM_COUNTS_KEY, "");
-        ownedItemCounts = new Dictionary<string, int>();
-        if (!string.IsNullOrEmpty(ownedItemCountsString))
-        {
-            foreach (string pair in ownedItemCountsString.Split(';'))
-            {
-                string[] keyValue = pair.Split(':');
-                if (keyValue.Length == 2)
-                {
-                    ownedItemCounts[keyValue[0]] = int.Parse(keyValue[1]);
-                }
-            }
-        }
-    }
 
 
 
@@ -374,7 +351,7 @@ public class PlayerStats : MonoBehaviour
     public void GainExperience(int amount)
     {
         if (amount <= 0) return;
-        
+
         // if under level cap, add exp
         if (_level < maxLevel)
         {
@@ -425,11 +402,11 @@ public class PlayerStats : MonoBehaviour
         {
             _currentHP = _maxHP;
         }
-        _currentHP = Mathf.Min(_currentHP, _maxHP); 
-        _currentHP = Mathf.Max(0, _currentHP);     
+        _currentHP = Mathf.Min(_currentHP, _maxHP);
+        _currentHP = Mathf.Max(0, _currentHP);
 
         Debug.Log($"Leveled up! New Level: {_level}. New Base HP: {baseMaxHP}, New Base ATK: {baseAttack}. Total MaxHP: {_maxHP}, Total ATK: {_attack}. CurrentHP: {_currentHP}");
-        
+
         if (_level >= maxLevel)
         {
             _currentExp = 0;
