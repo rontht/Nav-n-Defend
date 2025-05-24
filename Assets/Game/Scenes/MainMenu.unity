@@ -3618,12 +3618,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 5878898781353059459}
-  ForwardClickSound: {fileID: 8300000, guid: 79180f511d89441b9aa23ccae1992fe0, type: 3}
+  ForwardClickSound: {fileID: 8300000, guid: 130a177e727814a2ea78a886ab72213d, type: 3}
   BackwardClickSound: {fileID: 8300000, guid: 5039414d94a6e4e70a5ab9e8833e992a, type: 3}
+  LevelUpSound: {fileID: 8300000, guid: 4e1ff8faed12a475eba9be0e46072269, type: 3}
+  CashSound: {fileID: 8300000, guid: 79180f511d89441b9aa23ccae1992fe0, type: 3}
   VictorySound: {fileID: 8300000, guid: 2667a0a008b044e218b63df62e2be749, type: 3}
   DefeatSound: {fileID: 8300000, guid: a0ca8964c08d54c5dbebf245bdc474ca, type: 3}
   AttackClickSound: {fileID: 8300000, guid: 7e9ee6dc04a5d40d1a5dfc4beb9865e7, type: 3}
   PauseSound: {fileID: 8300000, guid: 2c5292ba5cf254919a6b9e2b18e04f49, type: 3}
+  CountdownTick: {fileID: 8300000, guid: 657578e4be6b64dbf9b09deada272e55, type: 3}
+  GameStartSound: {fileID: 8300000, guid: df729d213c4be44a9b55cd109f5cd4f9, type: 3}
+  ConnectSound: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
+  HightlightSound: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
+  DeathSound: {fileID: 8300000, guid: b9eff218e132a4e76be78840eca96fb2, type: 3}
 --- !u!82 &5878898781353059459
 AudioSource:
   m_ObjectHideFlags: 0

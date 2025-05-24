@@ -20,46 +20,57 @@ public class InventoryUIManager : MonoBehaviour
 
     private void PopulateInventory()
     {
-        foreach (Shop_Item_Data item in allItems)
+        // Get the list of purchased item IDs
+        List<string> purchasedItemIDs = PlayerStats.Instance.GetPurchasedItemIDs();
+
+        foreach (string itemId in purchasedItemIDs)
         {
-            // Check if the item is purchased
-            if (PlayerStats.Instance.HasPurchasedItem(item.id))
+            // Get item data by ID
+            Shop_Item_Data item = allItems.Find(i => i.id == itemId);
+            if (item == null)
             {
-                // Instantiate the item slot
-                GameObject itemSlot = Instantiate(itemSlotPrefab, inventoryContent);
-
-                // Get references to UI components within the prefab
-                Image icon = itemSlot.transform.Find("IconPanel/Icon").GetComponent<Image>();
-                TextMeshProUGUI nameText = itemSlot.transform.Find("IconPanel/Name").GetComponent<TextMeshProUGUI>();
-                TextMeshProUGUI bonusText = itemSlot.transform.Find("Bonus").GetComponent<TextMeshProUGUI>();
-                TextMeshProUGUI countText = itemSlot.transform.Find("CountPanel/Count").GetComponent<TextMeshProUGUI>();
-
-                // Set the item data
-                icon.sprite = item.icon;
-                nameText.text = item.itemName;
-                bonusText.text = $"{item.type}: +{item.value}";
-                
-                // Get the correct count from PlayerStats
-                // int itemCount = PlayerStats.Instance.GetItemQuantity(item.id);
-                // countText.text = itemCount.ToString();
-
-                // Optional: Add click handler for item use (e.g., equipping or consuming)
-                Button itemButton = itemSlot.GetComponent<Button>();
-                itemButton.onClick.AddListener(() => UseItem(item));
+                Debug.LogWarning($"Item data not found for ID: {itemId}");
+                continue;
             }
+
+            // Instantiate the item slot
+            GameObject itemSlot = Instantiate(itemSlotPrefab, inventoryContent);
+
+            // Get references to UI components within the prefab
+            Image icon = itemSlot.transform.Find("IconPanel/Icon").GetComponent<Image>();
+            TextMeshProUGUI nameText = itemSlot.transform.Find("Name").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI bonusText = itemSlot.transform.Find("Bonus").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI countText = itemSlot.transform.Find("CountPanel/Count").GetComponent<TextMeshProUGUI>();
+
+            // Set the item data
+            icon.sprite = item.icon;
+            nameText.text = item.itemName;
+            bonusText.text = $"{item.type}: +{item.value}";
+
+            int itemCount = PlayerStats.Instance.GetOwnedItemCount(itemId);
+            countText.text = $"x{itemCount}";
+
+            Button useButton = itemSlot.transform.Find("UseButton").GetComponent<Button>();
+            useButton.onClick.AddListener(() => UseItem(item));
         }
     }
 
     private void UseItem(Shop_Item_Data item)
     {
+        if (item == null)
+        {
+            Debug.LogError("Attempted to use a null item! This should not happen if PopulateInventory is working correctly.");
+            return;
+        }
+
+        Debug.Log($"Used {item.itemName}. Applying {item.type} +{item.value} bonus.");
+        // Shop_Item_Data item
         // Apply the item's stat bonus
         PlayerStats.Instance.IncreaseStat(item.type, item.value);
-        
+        UISoundPlayer.Instance.PlayCashSound();
         // Optionally reduce the item count or remove it from inventory if it is consumable
         // You can add more logic here if needed (e.g., consuming potions)
 
-        Debug.Log($"Used {item.itemName}. Applied {item.type} +{item.value}");
-        
         // Refresh inventory UI to reflect the change
         ClearInventoryUI();
         PopulateInventory();

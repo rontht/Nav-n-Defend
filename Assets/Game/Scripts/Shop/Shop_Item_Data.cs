@@ -9,7 +9,7 @@ public enum ItemType
     ///Damage dealing capability
     attack,
     /// Temporary effects, e.g., healing potions
-    Temp
+    Heal
 }
 
 /// ScriptableObject that defines a purchasable shop item.

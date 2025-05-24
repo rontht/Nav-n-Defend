@@ -5,10 +5,10 @@ public class SettingManager : MonoBehaviour
     public void ResetButtonFunction()
     {
         if (UISoundPlayer.Instance != null)
-            UISoundPlayer.Instance.PlayForwardClickSound();
+            UISoundPlayer.Instance.PlayDefeatSound();
         else
             Debug.Log("UISoundPlayer Instance not found.");
-        
+
         if (PlayerStats.Instance != null)
             PlayerStats.Instance.ResetStats();
         else
@@ -18,7 +18,7 @@ public class SettingManager : MonoBehaviour
     public void LevelButtonFunction()
     {
         if (UISoundPlayer.Instance != null)
-            UISoundPlayer.Instance.PlayVictorySound();
+            UISoundPlayer.Instance.PlayLevelUpSound();
         else
             Debug.Log("UISoundPlayer Instance not found.");
 
@@ -36,10 +36,22 @@ public class SettingManager : MonoBehaviour
             Debug.Log("UISoundPlayer Instance not found.");
 
         if (PlayerStats.Instance != null)
-            PlayerStats.Instance.AddCoins(10);
+            PlayerStats.Instance.AddCoins(100);
         else
             Debug.Log("Player Stats Instance not found.");
     }
+    
+    public void DamageButtonFunction()
+    {
+        if (UISoundPlayer.Instance != null)
+            UISoundPlayer.Instance.PlayDeathSound();
+        else
+            Debug.Log("UISoundPlayer Instance not found.");
 
+        if (PlayerStats.Instance != null)
+            PlayerStats.Instance.TakeDamage(50);
+        else
+            Debug.Log("Player Stats Instance not found.");
+    }
     // add something like changing number of nodes and grid for puzzle game
 }

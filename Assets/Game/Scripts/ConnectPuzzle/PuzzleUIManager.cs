@@ -69,6 +69,7 @@ public class PuzzleUIManager : MonoBehaviour
 
             PlayerStats.Instance.GainExperience(expReward);
             PlayerStats.Instance.AddCoins(coinReward);
+            UISoundPlayer.Instance.PlayVictorySound();
         }
     }
 

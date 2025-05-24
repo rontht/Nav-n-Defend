@@ -56,11 +56,13 @@ public class TreasureBoxDetection : MonoBehaviour
         // Create puzzle board with anchor's position in place of the box
         // PuzzleManager.Instance.StartPuzzle(anchor.transform.position, anchor.transform);
         PuzzleManager.Instance.StartPuzzle(transform.position);
+        UISoundPlayer.Instance.PlayGameStartSound();
         instance.gameObject.SetActive(false);
     }
 
     public static void GameEnd()
     {
+        UISoundPlayer.Instance.PlayForwardClickSound();
         if (instance != null)
             instance.gameObject.SetActive(true);
     }

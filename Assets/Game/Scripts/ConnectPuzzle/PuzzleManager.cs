@@ -191,6 +191,7 @@ public class PuzzleManager : MonoBehaviour
 
                         connectingPath.RemoveAt(connectingPath.Count - 1);
                         countForCurrentPath--;
+                        UISoundPlayer.Instance.PlayBackwardClickSound();
                         return;
                     }
                 }
@@ -211,6 +212,7 @@ public class PuzzleManager : MonoBehaviour
                     tileRenderer.material.color = highlightColor;
                     connectingPath.Add(currentPos);
                     countForCurrentPath++;
+                    UISoundPlayer.Instance.PlayHightlightSound();
                 }
             }
             // check if current tile contains a node of same color as starting node
@@ -228,7 +230,8 @@ public class PuzzleManager : MonoBehaviour
                     PuzzleUIManager uiManager = FindObjectOfType<PuzzleUIManager>();
                     if (uiManager != null)
                         uiManager.UpdateScore(countForCurrentPath);
-                        countForCurrentPath = 0;
+                    countForCurrentPath = 0;
+                    UISoundPlayer.Instance.PlayConnectSound();
 
                     // reset the tile effects
                     ResetTile();
@@ -240,6 +243,7 @@ public class PuzzleManager : MonoBehaviour
                     // reset the path if blocked by different colored nodes
                     ResetTile();
                     Debug.Log("Blocked by a different node.");
+                    UISoundPlayer.Instance.PlayBackwardClickSound();
                 }
             }
         }
