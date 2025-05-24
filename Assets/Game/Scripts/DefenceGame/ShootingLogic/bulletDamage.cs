@@ -7,6 +7,11 @@ public class bulletDamage : MonoBehaviour
     // This value should be based off of player damage stat.
     public int damageAmount = 20;
 
+    void Start()
+    {
+        damageAmount = PlayerStats.Instance.attack;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         GameObject root = collision.transform.root.gameObject;

@@ -19,6 +19,9 @@ public class imageTrackingToggle : MonoBehaviour
     private int bulletKills = 0;
     private int shotsMade = 0;
     private int shotsHit = 0;
+    private int coinsEarned = 0;
+    private int expEarned = 0;
+    private int hpLost = 10;
 
     // Splitting of these elements for visual clarity
     // via headers.
@@ -41,6 +44,9 @@ public class imageTrackingToggle : MonoBehaviour
     public TMP_Text statsShotsMadeText;
     public TMP_Text statsShotsHitText;
     public TMP_Text statsAccuracyText;
+    public TMP_Text expEarnedText;
+    public TMP_Text coinsEarnedText;
+    public TMP_Text hpLostText;
 
     public TMP_Text resultMessageText;
 
@@ -176,7 +182,23 @@ public class imageTrackingToggle : MonoBehaviour
             resultMessageText.text = isVictory ? "You Won!" : "You Lost!";
         }
 
-        Time.timeScale = 0f;
+        if (isVictory == true)
+        {
+            coinsEarned = 50;
+            expEarned = 5;
+            // PlayerStats.Instance.TakeDamage(10);
+        }
+        else
+        {
+            coinsEarned = 30;
+            expEarned = 3;
+            // PlayerStats.Instance.TakeDamage(10);
+        }
+            Time.timeScale = 0f;
+
+        PlayerStats.Instance.AddCoins(coinsEarned);
+        PlayerStats.Instance.GainExperience(expEarned);
+        PlayerStats.Instance.TakeDamage(hpLost);
 
         // Rewards for clear probably go into this method.
         UpdateStatsSummary();
@@ -307,5 +329,16 @@ public class imageTrackingToggle : MonoBehaviour
             float accuracy = shotsMade > 0 ? ((float)shotsHit / shotsMade) * 100f : 0f;
             statsAccuracyText.text = $"Accuracy: {accuracy:F1}%";
         }
+
+        if (expEarnedText != null)
+        {
+            expEarnedText.text = "EXP Earned: " + expEarned;
+        }
+
+        if (coinsEarnedText != null)
+            coinsEarnedText.text = "Coins Earned: " + coinsEarned;
+
+        if (hpLostText != null)
+            hpLostText.text = "HP Lost: " + hpLost;
     }
 }
