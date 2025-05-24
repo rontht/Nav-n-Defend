@@ -203,6 +203,7 @@ public class imageTrackingToggle : MonoBehaviour
     /// </summary>
     public void OnSurfaceFoundPressed()
     {
+        UISoundPlayer.Instance.PlayForwardClickSound();
         if (imageManager != null)
         {
             imageManager.enabled = false;
@@ -230,6 +231,7 @@ public class imageTrackingToggle : MonoBehaviour
     /// </summary>
     public void OnScanButtonPressed()
     {
+        UISoundPlayer.Instance.PlayForwardClickSound();
         if (imageManager != null)
         {
             imageManager.enabled = true;
