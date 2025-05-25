@@ -41,16 +41,17 @@ public class PlayerStats : MonoBehaviour
     public int expToLevelUp => _expToLevelUp;
     public int level => _level;
 
-   /// <summary>
-   /// public slimeDamage = 25;  /// Quick and dirty slime damage because I can't be bothered making ANOTHER event LISTENER GOD UUUUUGH
-   /// </summary>
+    /// <summary>
+    /// public slimeDamage = 25;  /// Quick and dirty slime damage because I can't be bothered making ANOTHER event LISTENER GOD UUUUUGH
+    /// </summary>
 
     // List to store the IDs of purchased items
     private List<string> purchasedItemIDs = new List<string>();
     // Dictionary to store the count of owned items
     private Dictionary<string, int> ownedItemCounts = new Dictionary<string, int>();
     // Dictionary to store currently equipped items by their ItemType (e.g., one HP item, one Attack item)
-    private Dictionary<ItemType, Shop_Item_Data> equippedItemIDs = new Dictionary<ItemType, Shop_Item_Data>();
+    // private Dictionary<ItemType, Shop_Item_Data> equippedItemIDs = new Dictionary<ItemType, Shop_Item_Data>();
+    private List<string> equippedItemIDs = new List<string>();
 
     // Constants for PlayerPrefs Keys
     private const string COINS_KEY = "PlayerCoins";
@@ -59,6 +60,7 @@ public class PlayerStats : MonoBehaviour
     private const string ATK_KEY = "PlayerAttack";
     private const string PURCHASED_ITEMS_KEY = "PurchasedItems";
     private const string OWNED_ITEM_COUNTS_KEY = "OwnedItemCounts";
+    private const string EQUIPPED_ITEMS_KEY = "PurchasedItems";
     private const string LEVEL_KEY = "PlayerLevel";
     private const string EXP_KEY = "PlayerExp";
     private const string EXP_TO_LEVEL_KEY = "PlayerExpToLevelUp";
@@ -143,6 +145,10 @@ public class PlayerStats : MonoBehaviour
         string ownedItemCountsString = string.Join(";", ownedItemCounts.Select(kv => kv.Key + ":" + kv.Value));
         PlayerPrefs.SetString(OWNED_ITEM_COUNTS_KEY, ownedItemCountsString);
 
+        // string equippedItemsString = string.Join(";", equippedItemIDs.Select(kv => $"{(int)kv.Key}:{kv.Value.id}"));
+        string equippedItemsString = string.Join(",", equippedItemIDs);
+        PlayerPrefs.SetString(EQUIPPED_ITEMS_KEY, equippedItemsString);
+
         PlayerPrefs.Save();
 
         StringBuilder tempItemsLog = new StringBuilder();
@@ -209,6 +215,33 @@ public class PlayerStats : MonoBehaviour
                 if (keyValue.Length == 2)
                 {
                     ownedItemCounts[keyValue[0]] = int.Parse(keyValue[1]);
+                }
+            }
+        }
+
+        string equippedItemsString = PlayerPrefs.GetString(EQUIPPED_ITEMS_KEY, "");
+        equippedItemIDs = new List<string>();
+
+        if (!string.IsNullOrEmpty(equippedItemsString))
+        {
+            equippedItemIDs = equippedItemsString.Split(',').ToList();
+
+            foreach (string itemId in equippedItemIDs)
+            {
+                var itemData = ShopManager.Instance?.availableItems.FirstOrDefault(i => i.id == itemId);
+                if (itemData != null)
+                {
+                    // Apply bonuses on load
+                    switch (itemData.type)
+                    {
+                        case ItemType.HP:
+                            _maxHP += itemData.value;
+                            _currentHP = Mathf.Min(_currentHP, _maxHP);
+                            break;
+                        case ItemType.attack:
+                            _attack += itemData.value;
+                            break;
+                    }
                 }
             }
         }
@@ -284,9 +317,13 @@ public class PlayerStats : MonoBehaviour
         return new List<string>(purchasedItemIDs);
     }
 
-    public Dictionary<ItemType, Shop_Item_Data> GetEquippedItemIDs()
+    // public Dictionary<ItemType, Shop_Item_Data> GetEquippedItemIDs()
+    // {
+    //     return equippedItemIDs;
+    // }
+    public List<string> GetEquippedItemIDs()
     {
-        return equippedItemIDs;
+        return new List<string>(equippedItemIDs);
     }
 
     private void RemoveFromPurchasedItems(string itemId)
@@ -299,38 +336,99 @@ public class PlayerStats : MonoBehaviour
         onStatsChanged?.Invoke();
     }
 
+    //public void EquipItem(Shop_Item_Data item)
+    // {
+    //     if (item == null)
+    //     {
+    //         Debug.LogWarning("Attempted to equip a null item.");
+    //         return;
+    //     }
+
+    //     ItemType type = item.type;
+
+    //     // If same type is already equipped, unequip it first
+    //     if (equippedItemIDs.ContainsKey(type))
+    //     {
+    //         UnequipItem(type);
+    //     }
+
+    //     // Equip the new item
+    //     equippedItemIDs[type] = item;
+
+    //     // Apply stat bonus
+    //     switch (type)
+    //     {
+    //         case ItemType.HP:
+    //             _maxHP += item.value;
+    //             _currentHP = Mathf.Min(_currentHP, maxHP);
+    //             break;
+    //         case ItemType.attack:
+    //             _attack += item.value;
+    //             break;
+    //     }
+
+    //     // Reduce inventory count
+    //     if (ownedItemCounts.ContainsKey(item.id))
+    //     {
+    //         ownedItemCounts[item.id]--;
+    //         if (ownedItemCounts[item.id] <= 0)
+    //         {
+    //             ownedItemCounts.Remove(item.id);
+    //         }
+    //     }
+
+    //     Debug.Log($"Equipped item {item.itemName} ({type}).");
+
+    //     SaveStats();
+    //     onStatsChanged?.Invoke();
+    // }
     public void EquipItem(Shop_Item_Data item)
     {
-        if (item == null)
+        if (item == null || equippedItemIDs.Contains(item.id))
         {
-            Debug.LogWarning("Attempted to equip a null item.");
+            Debug.LogWarning("Item is null or already equipped.");
             return;
         }
 
-        ItemType type = item.type;
+        // check if another item of the same type is already equipped
+        string existingItemId = null;
 
-        // If same type is already equipped, unequip it first
-        if (equippedItemIDs.ContainsKey(type))
+        foreach (var id in equippedItemIDs)
         {
-            UnequipItem(type);
+            var itemData = ShopManager.Instance?.availableItems.FirstOrDefault(i => i.id == id);
+            if (itemData != null && itemData.type == item.type)
+            {
+                existingItemId = id;
+                break;
+            }
         }
 
-        // Equip the new item
-        equippedItemIDs[type] = item;
+        // unequip the item of same type
+        if (!string.IsNullOrEmpty(existingItemId))
+        {
+            UnequipItemById(existingItemId);
+        }
+        else
+        {
+            UISoundPlayer.Instance.PlayCashSound();
+        }
 
-        // Apply stat bonus
-        switch (type)
+        // equipe the new item
+        equippedItemIDs.Add(item.id);
+
+        // apply stat changes
+        switch (item.type)
         {
             case ItemType.HP:
                 _maxHP += item.value;
-                _currentHP = Mathf.Min(_currentHP, maxHP);
+                _currentHP = Mathf.Min(_currentHP, _maxHP);
                 break;
             case ItemType.attack:
                 _attack += item.value;
                 break;
         }
 
-        // Reduce inventory count
+        // remove one item count from owned items
         if (ownedItemCounts.ContainsKey(item.id))
         {
             ownedItemCounts[item.id]--;
@@ -340,35 +438,38 @@ public class PlayerStats : MonoBehaviour
             }
         }
 
-        Debug.Log($"Equipped item {item.itemName} ({type}).");
-
         SaveStats();
         onStatsChanged?.Invoke();
     }
 
-    public void UnequipItem(ItemType type)
+    public void UnequipItemById(string itemId)
     {
-        if (!equippedItemIDs.ContainsKey(type)) return;
+        if (!equippedItemIDs.Contains(itemId)) return;
 
-        Shop_Item_Data item = equippedItemIDs[type];
+        // find the item from shop manager
+        var shop = ShopManager.Instance;
+        Shop_Item_Data item = shop?.availableItems.FirstOrDefault(i => i.id == itemId);
 
-        // Remove bonuses
-        switch (type)
+        if (item == null) return;
+
+        // apply the stat changes
+        switch (item.type)
         {
             case ItemType.HP:
                 _maxHP -= item.value;
-                _currentHP = Mathf.Min(_currentHP, maxHP); // Clamp current HP
+                _currentHP = Mathf.Min(_currentHP, _maxHP);
                 break;
             case ItemType.attack:
                 _attack -= item.value;
                 break;
         }
-        
-        UISoundPlayer.Instance.PlayBackwardClickSound();
-        // Return item to inventory
+
+        // remove the item from equippedItemIDs
+        equippedItemIDs.Remove(itemId);
+
+        // add one item count to owned items
         if (ownedItemCounts.ContainsKey(item.id))
         {
-            IncreaseItemCount(item.id, 1);
             ownedItemCounts[item.id]++;
         }
         else
@@ -376,13 +477,50 @@ public class PlayerStats : MonoBehaviour
             ownedItemCounts[item.id] = 1;
         }
 
-        equippedItemIDs.Remove(type);
-
-        Debug.Log($"Unequipped item {item.itemName} ({type}). Returned to inventory.");
+        UISoundPlayer.Instance.PlayBackwardClickSound();
 
         SaveStats();
         onStatsChanged?.Invoke();
     }
+
+
+    // public void UnequipItem(ItemType type)
+    // {
+    //     if (!equippedItemIDs.ContainsKey(type)) return;
+
+    //     Shop_Item_Data item = equippedItemIDs[type];
+
+    //     // Remove bonuses
+    //     switch (type)
+    //     {
+    //         case ItemType.HP:
+    //             _maxHP -= item.value;
+    //             _currentHP = Mathf.Min(_currentHP, maxHP); // Clamp current HP
+    //             break;
+    //         case ItemType.attack:
+    //             _attack -= item.value;
+    //             break;
+    //     }
+
+    //     UISoundPlayer.Instance.PlayBackwardClickSound();
+    //     // Return item to inventory
+    //     if (ownedItemCounts.ContainsKey(item.id))
+    //     {
+    //         IncreaseItemCount(item.id, 1);
+    //         ownedItemCounts[item.id]++;
+    //     }
+    //     else
+    //     {
+    //         ownedItemCounts[item.id] = 1;
+    //     }
+
+    //     equippedItemIDs.Remove(type);
+
+    //     Debug.Log($"Unequipped item {item.itemName} ({type}). Returned to inventory.");
+
+    //     SaveStats();
+    //     onStatsChanged?.Invoke();
+    // }
 
     public void DecreaseItemCount(string itemId, int amount)
     {

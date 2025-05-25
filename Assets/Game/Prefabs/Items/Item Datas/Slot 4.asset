@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Slot 4
   m_EditorClassIdentifier: 
   id: 973a1a39-0838-42ad-9e01-227ed5c180f9
-  itemName: Tier [2] HP
+  itemName: Greater Potion
   description: 
-  cost: 75
-  icon: {fileID: 21300000, guid: 5b1107c6d2a0f904b8033227f55861b2, type: 3}
-  maxPlayerOwns: 1
-  type: 0
-  value: 35
+  cost: 50
+  icon: {fileID: 21300000, guid: fda6cc1aaaee94d4f986634270d0b1f1, type: 3}
+  maxPlayerOwns: 3
+  type: 2
+  value: 100

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Slot 9
   m_EditorClassIdentifier: 
   id: 660305f1-78f5-4029-be4a-edd63118644e
-  itemName: Tier [1] HP
+  itemName: Steelbound Cuirass
   description: 
-  cost: 10
-  icon: {fileID: 21300000, guid: 6ca95804c991fdc49944f96f449edc9e, type: 3}
+  cost: 150
+  icon: {fileID: 21300000, guid: 1acd7f18bcf922f4f835b7671fac6388, type: 3}
   maxPlayerOwns: 1
   type: 0
-  value: 20
+  value: 25

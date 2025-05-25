@@ -2,12 +2,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class InventoryUIManager : MonoBehaviour
 {
     [Header("UI Prefabs")]
     public Transform inventoryContent;
-    public Transform contentPanel;
     public GameObject itemSlotPrefab;
 
     [Header("Item Data")]
@@ -81,7 +81,6 @@ public class InventoryUIManager : MonoBehaviour
             // Equip the item (e.g., HP or attack boost)
             PlayerStats.Instance.EquipItem(item);
             PlayerStats.Instance.DecreaseItemCount(item.id, 1);
-            UISoundPlayer.Instance.PlayCashSound();
             PopulateEquipment();
         }
 
@@ -105,10 +104,27 @@ public class InventoryUIManager : MonoBehaviour
 
     public void PopulateEquipment()
     {
-        Dictionary<ItemType, Shop_Item_Data> equippedItems = PlayerStats.Instance.GetEquippedItemIDs();
-        Debug.Log("Equipped Items Count: " + equippedItems.Count);
+        List<string> equippedItemIDs = PlayerStats.Instance.GetEquippedItemIDs();
+        Shop_Item_Data hpItem = null;
+        Shop_Item_Data atkItem = null;
+
+        // find items from shopManager by ids
+        foreach (string id in equippedItemIDs)
+        {
+            Shop_Item_Data item = ShopManager.Instance.availableItems.Find(x => x.id == id);
+            if (item != null)
+            {
+                Debug.Log($"Found item: {item.itemName} ({item.type})");
+
+                if (item.type == ItemType.HP)
+                    hpItem = item;
+                else if (item.type == ItemType.attack)
+                    atkItem = item;
+            }
+        }
+
         // Handle HP Equipment
-        if (equippedItems.TryGetValue(ItemType.HP, out Shop_Item_Data hpItem))
+        if (hpItem != null)
         {
             UpdateEquipmentPanel(hpEquipmentPanel, hpItem);
         }
@@ -118,7 +134,7 @@ public class InventoryUIManager : MonoBehaviour
         }
 
         // Handle Attack Equipment
-        if (equippedItems.TryGetValue(ItemType.attack, out Shop_Item_Data atkItem))
+        if (atkItem != null)
         {
             UpdateEquipmentPanel(attackEquipmentPanel, atkItem);
         }
@@ -146,7 +162,7 @@ public class InventoryUIManager : MonoBehaviour
         unequipButton.onClick.RemoveAllListeners();
         unequipButton.onClick.AddListener(() =>
         {
-            PlayerStats.Instance.UnequipItem(item.type);
+            PlayerStats.Instance.UnequipItemById(item.id);
             PopulateEquipment();
             RefreshInventoryUI();
         });
@@ -154,7 +170,10 @@ public class InventoryUIManager : MonoBehaviour
 
     private void ClearEquipmentPanel(GameObject panel)
     {
-        panel.SetActive(false);
+        if (panel.activeSelf)
+        {
+            panel.SetActive(false);
+        }
         // panel.transform.Find("Name").GetComponent<TextMeshProUGUI>().text = "-";
         // panel.transform.Find("Bonus").GetComponent<TextMeshProUGUI>().text = "";
         // panel.transform.Find("IconPanel/Icon").GetComponent<Image>().sprite = null;
@@ -162,5 +181,4 @@ public class InventoryUIManager : MonoBehaviour
         // Button unequipButton = panel.transform.Find("UnequipButton").GetComponent<Button>();
         // unequipButton.onClick.RemoveAllListeners();
     }
-
 }

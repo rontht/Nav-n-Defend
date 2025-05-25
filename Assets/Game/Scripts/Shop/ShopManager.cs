@@ -14,7 +14,7 @@ public class ShopManager : MonoBehaviour
     public List<Shop_Item_Data> availableItems = new List<Shop_Item_Data>();
     
     [Header("UI References")]
-    public GameObject purchaseConfirmationDialog;
+    public GameObject Confirmation;
     public TextMeshProUGUI confirmationText;
     
     public UnityEvent onItemPurchased;
@@ -33,7 +33,7 @@ public class ShopManager : MonoBehaviour
     {
         pendingPurchaseItem = item;
         confirmationText.text = $"Purchase {item.itemName} for {item.cost} coins?";
-        purchaseConfirmationDialog.SetActive(true);
+        Confirmation.SetActive(true);
     }
 
     public void ConfirmPurchase()
@@ -47,7 +47,7 @@ public class ShopManager : MonoBehaviour
 
     public void ClosePurchaseConfirmation()
     {
-        purchaseConfirmationDialog.SetActive(false);
+        Confirmation.SetActive(false);
         pendingPurchaseItem = null;
     }    
 
