@@ -432,45 +432,6 @@ public class PlayerStats : MonoBehaviour
         onStatsChanged?.Invoke();
     }
 
-
-    // public void UnequipItem(ItemType type)
-    // {
-    //     if (!equippedItemIDs.ContainsKey(type)) return;
-
-    //     Shop_Item_Data item = equippedItemIDs[type];
-
-    //     // Remove bonuses
-    //     switch (type)
-    //     {
-    //         case ItemType.HP:
-    //             _maxHP -= item.value;
-    //             _currentHP = Mathf.Min(_currentHP, maxHP); // Clamp current HP
-    //             break;
-    //         case ItemType.attack:
-    //             _attack -= item.value;
-    //             break;
-    //     }
-
-    //     UISoundPlayer.Instance.PlayBackwardClickSound();
-    //     // Return item to inventory
-    //     if (ownedItemCounts.ContainsKey(item.id))
-    //     {
-    //         IncreaseItemCount(item.id, 1);
-    //         ownedItemCounts[item.id]++;
-    //     }
-    //     else
-    //     {
-    //         ownedItemCounts[item.id] = 1;
-    //     }
-
-    //     equippedItemIDs.Remove(type);
-
-    //     Debug.Log($"Unequipped item {item.itemName} ({type}). Returned to inventory.");
-
-    //     SaveStats();
-    //     onStatsChanged?.Invoke();
-    // }
-
     public void DecreaseItemCount(string itemId, int amount)
     {
         if (ownedItemCounts.ContainsKey(itemId))
