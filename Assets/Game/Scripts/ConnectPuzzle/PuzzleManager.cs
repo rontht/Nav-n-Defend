@@ -102,7 +102,7 @@ public class PuzzleManager : MonoBehaviour
                 node.name = $"Node_{pair}_{n}";
 
                 // scale node to fit within the tile
-                node.transform.localScale = Vector3.one * (tileSize * 0.9f);
+                node.transform.localScale = new Vector3(tileSize - 0.01f, 0.03f, tileSize - 0.01f);
 
                 // set the node color
                 node.GetComponent<Renderer>().material.color = pairColor;

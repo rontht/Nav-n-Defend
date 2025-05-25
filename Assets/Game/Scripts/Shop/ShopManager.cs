@@ -34,6 +34,7 @@ public class ShopManager : MonoBehaviour
         pendingPurchaseItem = item;
         confirmationText.text = $"Purchase {item.itemName} for {item.cost} coins?";
         Confirmation.SetActive(true);
+        UISoundPlayer.Instance.PlayForwardClickSound();
     }
 
     public void ConfirmPurchase()
@@ -41,12 +42,17 @@ public class ShopManager : MonoBehaviour
         if (pendingPurchaseItem != null && TryPurchaseItem(pendingPurchaseItem))
         {
             onItemPurchased?.Invoke();
+            UISoundPlayer.Instance.PlayCashSound();
         }
-        ClosePurchaseConfirmation();
+        ClosePurchaseConfirmation(1);
     }
 
-    public void ClosePurchaseConfirmation()
+    public void ClosePurchaseConfirmation(int type)
     {
+        if (type != 1)
+        {
+            UISoundPlayer.Instance.PlayBackwardClickSound();
+        }
         Confirmation.SetActive(false);
         pendingPurchaseItem = null;
     }    

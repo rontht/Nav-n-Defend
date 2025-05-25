@@ -806,7 +806,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: d38f8dedc0ad24449bdd6ddc2480ff0f, type: 3}
+  m_Texture: {fileID: 2800000, guid: 929381ba3f5c1214d9c5862bb587d6a8, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -2385,7 +2385,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04a6447105c20554a8f3d9b65e99c316, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nodePrefab: {fileID: 8756954389233692207, guid: 259fe79429c774d408c76dfb28984187,
+  nodePrefab: {fileID: 8525509776621616652, guid: 56394b3685c33d84bb091a90d8f45921,
     type: 3}
   gridPrefab: {fileID: 8525509776621616652, guid: fb6fd76577cd9854ab752ebafca88b1c,
     type: 3}

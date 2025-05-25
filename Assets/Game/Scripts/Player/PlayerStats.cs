@@ -50,7 +50,6 @@ public class PlayerStats : MonoBehaviour
     // Dictionary to store the count of owned items
     private Dictionary<string, int> ownedItemCounts = new Dictionary<string, int>();
     // Dictionary to store currently equipped items by their ItemType (e.g., one HP item, one Attack item)
-    // private Dictionary<ItemType, Shop_Item_Data> equippedItemIDs = new Dictionary<ItemType, Shop_Item_Data>();
     private List<string> equippedItemIDs = new List<string>();
 
     // Constants for PlayerPrefs Keys
@@ -317,10 +316,6 @@ public class PlayerStats : MonoBehaviour
         return new List<string>(purchasedItemIDs);
     }
 
-    // public Dictionary<ItemType, Shop_Item_Data> GetEquippedItemIDs()
-    // {
-    //     return equippedItemIDs;
-    // }
     public List<string> GetEquippedItemIDs()
     {
         return new List<string>(equippedItemIDs);
@@ -336,52 +331,6 @@ public class PlayerStats : MonoBehaviour
         onStatsChanged?.Invoke();
     }
 
-    //public void EquipItem(Shop_Item_Data item)
-    // {
-    //     if (item == null)
-    //     {
-    //         Debug.LogWarning("Attempted to equip a null item.");
-    //         return;
-    //     }
-
-    //     ItemType type = item.type;
-
-    //     // If same type is already equipped, unequip it first
-    //     if (equippedItemIDs.ContainsKey(type))
-    //     {
-    //         UnequipItem(type);
-    //     }
-
-    //     // Equip the new item
-    //     equippedItemIDs[type] = item;
-
-    //     // Apply stat bonus
-    //     switch (type)
-    //     {
-    //         case ItemType.HP:
-    //             _maxHP += item.value;
-    //             _currentHP = Mathf.Min(_currentHP, maxHP);
-    //             break;
-    //         case ItemType.attack:
-    //             _attack += item.value;
-    //             break;
-    //     }
-
-    //     // Reduce inventory count
-    //     if (ownedItemCounts.ContainsKey(item.id))
-    //     {
-    //         ownedItemCounts[item.id]--;
-    //         if (ownedItemCounts[item.id] <= 0)
-    //         {
-    //             ownedItemCounts.Remove(item.id);
-    //         }
-    //     }
-
-    //     Debug.Log($"Equipped item {item.itemName} ({type}).");
-
-    //     SaveStats();
-    //     onStatsChanged?.Invoke();
-    // }
     public void EquipItem(Shop_Item_Data item)
     {
         if (item == null || equippedItemIDs.Contains(item.id))
