@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -34,7 +33,7 @@ public class SinglePlaneDetector : MonoBehaviour
             yield return null;
         }
 
-        yield return new WaitForSeconds(1f); // extra buffer
+        yield return new WaitForSeconds(1f); // extra buffer.
 
         planeManager.planesChanged += OnPlanesChanged;
         planeManager.enabled = true;
@@ -78,11 +77,11 @@ public class SinglePlaneDetector : MonoBehaviour
         planeLocked = true;
         selectedPlane = plane;
 
-        // Stop further plane changes
+        // Stop further plane changes.
         planeManager.planesChanged -= OnPlanesChanged;
         planeManager.enabled = false;
 
-        // Hide other planes
+        // Hide other planes.
         foreach (var p in planeManager.trackables)
         {
             if (p.trackableId != plane.trackableId)
