@@ -1,6 +1,13 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// This movement is basic tutorial stuff but works well.
+/// Future iterations should be more refined.
+/// Maybe create a new game mode where they chase the player.
+/// Automate rotations.
+/// </summary>
+
 public class EnemyMover : MonoBehaviour
 {
     public Transform target;

@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
+// Generic example supplied from elsewhere. Doesn't work.
+// Keeping as something to build off of later.
+
 [RequireComponent(typeof(MeshCollider), typeof(ARPlaneMeshVisualizer))]
 public class PlaneColliderUpdater : MonoBehaviour
 {
