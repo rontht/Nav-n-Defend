@@ -3320,38 +3320,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1448773707}
   m_CullTransparentMesh: 1
---- !u!1 &1456232162
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1456232163}
-  m_Layer: 0
-  m_Name: Scripts
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1456232163
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1456232162}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 131.13547, y: 523.6706, z: 3.7555282}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2004670299}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1865313684
 GameObject:
   m_ObjectHideFlags: 0
@@ -3992,8 +3960,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2004670299}
-  - component: {fileID: 2004670298}
-  - component: {fileID: 2004670297}
   - component: {fileID: 2004670300}
   m_Layer: 0
   m_Name: StatsManager
@@ -4002,34 +3968,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2004670297
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2004670296}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 716ee196b23969149ab8cc959a19f1f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  expSlider: {fileID: 601085900}
-  levelText: {fileID: 1992365072}
---- !u!114 &2004670298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2004670296}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 42a809e7e9cb19244b30259d78fde50c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hpSlider: {fileID: 1386157745}
-  hpText: {fileID: 150277062}
 --- !u!4 &2004670299
 Transform:
   m_ObjectHideFlags: 0
@@ -4039,11 +3977,11 @@ Transform:
   m_GameObject: {fileID: 2004670296}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 131.13547, y: 523.6706, z: 3.7555282}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1456232163}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2004670300
 MonoBehaviour:
@@ -4057,8 +3995,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b06856247cdbb64a9bcb3036c6b46cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackText: {fileID: 613487868}
   cashText: {fileID: 998948120}
+  attackText: {fileID: 613487868}
+  expSlider: {fileID: 601085900}
+  levelText: {fileID: 1992365072}
+  hpSlider: {fileID: 1386157745}
+  hpText: {fileID: 150277062}
 --- !u!1 &2122453709
 GameObject:
   m_ObjectHideFlags: 0
@@ -4472,6 +4414,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 64310436}
   - {fileID: 883948510}
-  - {fileID: 1456232163}
+  - {fileID: 2004670299}
   - {fileID: 193310233}
   - {fileID: 7111790276216358362}
